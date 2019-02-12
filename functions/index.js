@@ -14,9 +14,10 @@ function checkEmpty(uncheckedValue) {
 
 
 exports.register = functions.https.onRequest((request, response) => {
-    console.log(request.body);
-    console.log(checkEmpty(request.body.name) ? request.body.name : defaultValue);
 
+    let resultObj = {
+        excutionResult: 'fail',
+    };
     //normalize
     let defaultValue = "";
     let name = checkEmpty(request.body.name) ? request.body.name : defaultValue;
@@ -49,9 +50,12 @@ exports.register = functions.https.onRequest((request, response) => {
             permission: permission,
             image: image,
         }).then(documentReference => {
-            console.log(`Added document with name '${documentReference.id}'`);
+            resultObj.excutionResult = 'success';
+            response.json(resultObj);
+        }).catch(reason => {
+            response.json(resultObj);
         });
-    response.send('ok');
+
 
 });
 
@@ -71,13 +75,46 @@ exports.register = functions.https.onRequest((request, response) => {
 
 // });
 
-// exports.addAnnouncement = functions.https.onRequest((request, response) => {
+exports.addAnnouncement = functions.https.onRequest((request, response) => {
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+    let defaultValue = "";
+    let title = checkEmpty(request.body.title) ? request.body.title : defaultValue;
+    let time = admin.firestore.Timestamp.now();
+    let detail = checkEmpty(request.body.detail) ? request.body.detail : defaultValue;
 
-// });
+    admin.firestore().collection('announcement').add({
+        title: title,
+        time: time,
+        detail: detail,
+    }).then(docRef => {
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        response.json(resultObj);
+    });
+});
 
-// exports.getAnnouncement = functions.https.onRequest((request, response) => {
-
-// });
+exports.getAnnouncement = functions.https.onRequest((request, response) => {
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+    admin.firestore().collection('announcement').orderBy('time','desc').limit(1).get().then(snapshot => {
+        resultObj.announcement = {};
+        snapshot.forEach(doc => {
+            data = doc.data();
+            resultObj.announcement.title = data.title;
+            resultObj.announcement.time = data.time;
+            resultObj.announcement.detail = data.detail;
+            console.log(doc.data());
+        });
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason=>{
+        response.json(resultObj);
+    })
+});
 
 // exports.getAbsentNoteList = functions.https.onRequest((request, response) => {
 
@@ -136,7 +173,7 @@ exports.getTeamList = functions.https.onRequest((request, response) => {
     };
     admin.firestore().collection('Team').get().then(snapShot => {
         resultObj.teamList = [];
-        snapShot.forEach(doc=>{
+        snapShot.forEach(doc => {
             resultObj.teamList.push(doc.id);
         })
         resultObj.excutionResult = 'success';
