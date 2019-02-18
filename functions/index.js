@@ -37,24 +37,29 @@ exports.register = functions.https.onRequest((request, response) => {
     //確認team存在
     //確認workingType存在
 
-
-    admin.firestore().collection('users').add(
-        {
-            name: name,
-            phoneNumber: phoneNumber,
-            gender: gender,
-            jobTitle: jobTitle,
-            team: team,
-            workingType: workingType,
-            verified: verified,
-            permission: permission,
-            image: image,
-        }).then(documentReference => {
-            resultObj.excutionResult = 'success';
-            response.json(resultObj);
-        }).catch(reason => {
-            response.json(resultObj);
-        });
+    admin.auth().createUser({
+        phoneNumber: phoneNumber,
+    }).then(userRecord => {
+        console.log(userRecord);
+        admin.firestore().collection('users').doc(userRecord.uid).set(
+            {
+                name: name,
+                phoneNumber: phoneNumber,
+                gender: gender,
+                jobTitle: jobTitle,
+                team: team,
+                workingType: workingType,
+                verified: verified,
+                permission: permission,
+                image: image,
+            })
+    }).then(documentReference => {
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason)
+        response.json(resultObj);
+    });
 
 
 });
@@ -100,7 +105,7 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',
     };
-    admin.firestore().collection('announcement').orderBy('time','desc').limit(1).get().then(snapshot => {
+    admin.firestore().collection('announcement').orderBy('time', 'desc').limit(1).get().then(snapshot => {
         resultObj.announcement = {};
         snapshot.forEach(doc => {
             data = doc.data();
@@ -111,7 +116,7 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
         });
         resultObj.excutionResult = 'success';
         response.json(resultObj);
-    }).catch(reason=>{
+    }).catch(reason => {
         response.json(resultObj);
     })
 });
