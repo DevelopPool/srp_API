@@ -1,7 +1,9 @@
 
 const functions = require('firebase-functions');
-
 const admin = require('firebase-admin');
+const team = require('./team');
+const util = require('./util');
+const announcement = require('./announcement');
 admin.initializeApp();
 
 function checkEmpty(uncheckedValue) {
@@ -61,10 +63,9 @@ exports.register = functions.https.onRequest((request, response) => {
         response.json(resultObj);
     });
 
-
 });
 
-// exports.login = functions.https.onRequest((request, response) => {
+// exports.checkLogin = functions.https.onRequest((request, response) => {
 
 // });
 
@@ -80,46 +81,9 @@ exports.register = functions.https.onRequest((request, response) => {
 
 // });
 
-exports.addAnnouncement = functions.https.onRequest((request, response) => {
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    let defaultValue = "";
-    let title = checkEmpty(request.body.title) ? request.body.title : defaultValue;
-    let time = admin.firestore.Timestamp.now();
-    let detail = checkEmpty(request.body.detail) ? request.body.detail : defaultValue;
+exports.addAnnouncement = announcement.addAnnouncement;
 
-    admin.firestore().collection('announcement').add({
-        title: title,
-        time: time,
-        detail: detail,
-    }).then(docRef => {
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        response.json(resultObj);
-    });
-});
-
-exports.getAnnouncement = functions.https.onRequest((request, response) => {
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    admin.firestore().collection('announcement').orderBy('time', 'desc').limit(1).get().then(snapshot => {
-        resultObj.announcement = {};
-        snapshot.forEach(doc => {
-            data = doc.data();
-            resultObj.announcement.title = data.title;
-            resultObj.announcement.time = data.time;
-            resultObj.announcement.detail = data.detail;
-            console.log(doc.data());
-        });
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        response.json(resultObj);
-    })
-});
+exports.getAnnouncement = announcement.getAnnouncement;
 
 // exports.getAbsentNoteList = functions.https.onRequest((request, response) => {
 
@@ -137,56 +101,8 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
 
 // });
 
-exports.addTeam = functions.https.onRequest((request, response) => {
+exports.addTeam = team.addTeam;
 
-    let teamName = checkEmpty(request.body.teamName) ? request.body.teamName : "";
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    if (teamName !== "") {
-        admin.firestore().collection('Team').doc(teamName).set({}).then(writeResult => {
-            console.log(writeResult);
-            resultObj.excutionResult = 'success';
-            response.json(resultObj);
-        }).catch(reason => {
-            console.log(reason);
-            response.json(resultObj);
-        })
-            ;
-    }
-});
+exports.deleteTeam = team.deleteTeam;
 
-exports.deleteTeam = functions.https.onRequest((request, response) => {
-    let teamName = checkEmpty(request.body.teamName) ? request.body.teamName : "";
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    admin.firestore().collection('Team').doc(teamName).delete().then(writeResult => {
-        console.log(writeResult);
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        console.log(reason);
-        response.json(resultObj);
-    })
-});
-
-exports.getTeamList = functions.https.onRequest((request, response) => {
-    console.log('getTeamList');
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    admin.firestore().collection('Team').get().then(snapShot => {
-        resultObj.teamList = [];
-        snapShot.forEach(doc => {
-            resultObj.teamList.push(doc.id);
-        })
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-
-    }).catch(reason => {
-        console.log(reason);
-        response.send('fail');
-
-    })
-});
+exports.getTeamList = team.getTeamList;
