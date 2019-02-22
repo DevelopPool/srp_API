@@ -9,7 +9,7 @@ exports.addTeam = functions.https.onRequest((request, response) => {
         excutionResult: 'fail',
     };
     if (teamName !== "") {
-        admin.firestore().collection('Team').doc(teamName).set({}).then(writeResult => {
+        admin.firestore().collection('team').doc(teamName).set({}).then(writeResult => {
             console.log(writeResult);
             resultObj.excutionResult = 'success';
             response.json(resultObj);
@@ -27,7 +27,7 @@ exports.deleteTeam = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',
     };
-    admin.firestore().collection('Team').doc(teamName).delete().then(writeResult => {
+    admin.firestore().collection('team').doc(teamName).delete().then(writeResult => {
         console.log(writeResult);
         resultObj.excutionResult = 'success';
         response.json(resultObj);
@@ -43,7 +43,7 @@ exports.getTeamList = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',
     };
-    admin.firestore().collection('Team').get().then(snapShot => {
+    admin.firestore().collection('team').get().then(snapShot => {
         resultObj.teamList = [];
         snapShot.forEach(doc => {
             resultObj.teamList.push(doc.id);
