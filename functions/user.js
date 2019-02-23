@@ -245,6 +245,7 @@ exports.updateUser = functions.https.onRequest((request, response) => {
             jobTitle: _jobTitle,
             team: _team,
             workingType: _workingType,
+            verified:_verified,
         });
     }).then(() => {
         resultObj.excutionResult = 'success';
