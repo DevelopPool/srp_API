@@ -306,7 +306,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"\",\n\t\"team\":\"team123\",\n\t\"workingType\":\"\",\n\t\"name\":\"\",\n\t\"jobTitle\":\"\"\n}"
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"\",\n\t\"jobTitle\":\"\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/updateUser",
@@ -315,6 +315,34 @@
 					],
 					"path": [
 						"updateUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{hoat}}/getUserDetail",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/getUserDetail",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getUserDetail"
 					]
 				}
 			},
