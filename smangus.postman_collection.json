@@ -19,51 +19,21 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
+						"value": "application/json",
 						"type": "text"
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "teamName",
-							"value": "team1",
-							"type": "text"
-						},
-						{
-							"key": "gender",
-							"value": "M",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "jobTitle",
-							"value": "title1",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "team",
-							"value": "team1",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "phoneNumber",
-							"value": "0912345678",
-							"type": "text",
-							"disabled": true
-						}
-					]
+					"mode": "raw",
+					"raw": "{\n\t\"gender\":\"male\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"fullTime\",\n\t\"name\":\"wulala\",\n\t\"jobTitle\":\"superman\",\n\t\"phoneNumber\":\"+886912345679\"\n\t\n}"
 				},
 				"url": {
-					"raw": "{{host}}/addTeam",
+					"raw": "{{host}}/register",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						"addTeam"
+						"register"
 					]
 				}
 			},
@@ -77,51 +47,21 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
+						"value": "application/json",
 						"type": "text"
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "teamName",
-							"value": "team1",
-							"type": "text"
-						},
-						{
-							"key": "gender",
-							"value": "M",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "jobTitle",
-							"value": "title1",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "team",
-							"value": "team1",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "phoneNumber",
-							"value": "0912345678",
-							"type": "text",
-							"disabled": true
-						}
-					]
+					"mode": "raw",
+					"raw": "{\n\t\"teamName\":\"team101\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/deleteTeam",
+					"raw": "{{host}}/addTeam",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						"deleteTeam"
+						"addTeam"
 					]
 				}
 			},
@@ -319,6 +259,34 @@
 					],
 					"path": [
 						"getAnnouncement"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "checkLogin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/checkLogin",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"checkLogin"
 					]
 				}
 			},
