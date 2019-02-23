@@ -58,10 +58,10 @@ exports.register = functions.https.onRequest((request, response) => {
     //確認team存在
     let teamCheck = firestore.collection(util.tables.team.tableName).doc(_team).get().then(snapshot => {
         if (snapshot.exists) {
-            return Promise.resolve('teamCheck exists');
+            return Promise.resolve('team exists');
         }
         else {
-            return Promise.reject('teamCheck does not exists');
+            return Promise.reject('team does not exists');
         }
     });
 
@@ -128,31 +128,7 @@ exports.register = functions.https.onRequest((request, response) => {
     }).catch(reason => {
         console.log(reason)
         response.json(resultObj);
-    })
-
-    // admin.auth().createUser({
-    //     phoneNumber: _phoneNumber,
-    // }).then(userRecord => {
-    //     console.log(userRecord);
-    //     admin.firestore().collection('users').doc(userRecord.uid).set(
-    //         {
-    //             name: _name,
-    //             phoneNumber: _phoneNumber,
-    //             gender: _gender,
-    //             jobTitle: _jobTitle,
-    //             team: _team,
-    //             workingType: _workingType,
-    //             verified: _verified,
-    //             permission: _permission,
-    //             image: _image,
-    //         })
-    // }).then(documentReference => {
-    //     resultObj.excutionResult = 'success';
-    //     response.json(resultObj);
-    // }).catch(reason => {
-    //     console.log(reason)
-    //     response.json(resultObj);
-    // });
+    });
 
 });
 
@@ -219,9 +195,73 @@ exports.checkLogin = functions.https.onRequest((request, response) => {
 //     });
 // });
 
-// exports.updateUser = functions.https.onRequest((request, response) => {
+exports.updateUser = functions.https.onRequest((request, response) => {
+    let resultObj = {
+        excutionResult: 'fail',
+    };
 
-// });
+    //normalize
+    let defaultValue = " ";
+    let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+    let _name = util.checkEmpty(request.body.name) ? request.body.name : defaultValue;
+    let _phoneNumber = util.checkEmpty(request.body.phoneNumber) ? request.body.phoneNumber : defaultValue;
+    let _gender = util.checkEmpty(request.body.gender) ? request.body.gender : defaultValue;
+    let _jobTitle = util.checkEmpty(request.body.jobTitle) ? request.body.jobTitle : defaultValue;
+    let _team = util.checkEmpty(request.body.team) ? request.body.team : defaultValue;
+    let _workingType = util.checkEmpty(request.body.workingType) ? request.body.workingType : defaultValue;
+    let _verified = true;
+
+    //確認gender存在
+    let genderCheck = firestore.collection(util.tables.gender.tableName).doc(_gender).get().then(snapshot => {
+        if (snapshot.exists) {
+            return Promise.resolve('gender exists');
+        }
+        else {
+            return Promise.reject('gender does not exists');
+        }
+    });
+
+    //確認jobTitle存在？
+
+    //確認team存在
+    let teamCheck = firestore.collection(util.tables.team.tableName).doc(_team).get().then(snapshot => {
+        if (snapshot.exists) {
+            return Promise.resolve('team exists');
+        }
+        else {
+            return Promise.reject('team does not exists');
+        }
+    });
+
+    //確認workingType存在
+    let workingTypeCheck = firestore.collection(util.tables.workingType.tableName).doc(_workingType).get().then(snapshot => {
+        if (snapshot.exists) {
+            return Promise.resolve('workingType exists');
+        }
+        else {
+            return Promise.reject('workingType does not exists');
+        }
+    });
+
+    Promise.all([genderCheck, teamCheck, workingTypeCheck]).then(value => {
+         firestore.collection(util.tables.users.tableName).doc(_uid).update({
+            name: _name,
+            gender: _gender,
+            jobTitle: _jobTitle,
+            team: _team,
+            workingType: _workingType,
+         });
+    }).then(() => {
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason)
+        response.json(resultObj);
+    });
+
+    
+
+});
 
 // exports.addWork = functions.https.onRequest((request, response) => {
 

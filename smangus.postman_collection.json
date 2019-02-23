@@ -291,6 +291,34 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "{{host}}/updateUser",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"\",\n\t\"team\":\"team123\",\n\t\"workingType\":\"\",\n\t\"name\":\"\",\n\t\"jobTitle\":\"\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/updateUser",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"updateUser"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
