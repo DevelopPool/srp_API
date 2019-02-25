@@ -8,6 +8,16 @@ exports.checkEmpty = function checkEmpty(uncheckedValue) {
 }
 
 exports.tables = {
+    punchRecord:{
+        tableName:"punchRecord",
+        columns:{
+            issuer:"isser",
+            authorizer:"authorizer",
+            punchTime:"punchTime",
+            modify:"time"
+        }
+    },
+    //todo
     users: {
         tableName: 'users',
         columns: {

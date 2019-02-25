@@ -199,7 +199,6 @@ exports.updateUser = functions.https.onRequest((request, response) => {
     let defaultValue = " ";
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
     let _name = util.checkEmpty(request.body.name) ? request.body.name : defaultValue;
-    let _phoneNumber = util.checkEmpty(request.body.phoneNumber) ? request.body.phoneNumber : defaultValue;
     let _gender = util.checkEmpty(request.body.gender) ? request.body.gender : defaultValue;
     let _jobTitle = util.checkEmpty(request.body.jobTitle) ? request.body.jobTitle : defaultValue;
     let _team = util.checkEmpty(request.body.team) ? request.body.team : defaultValue;
