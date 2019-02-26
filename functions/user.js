@@ -153,7 +153,7 @@ exports.checkLogin = functions.https.onRequest((request, response) => {
             // 寫入 login record 
             return firestore.collection(util.tables.loginRecord.tableName).add({
                 uid: userRecord.uid,
-                loginTime: Date.now(),
+                loginTime: new Date(),
             })
 
         }
