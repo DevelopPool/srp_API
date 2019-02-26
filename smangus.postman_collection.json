@@ -25,7 +25,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"gender\":\"male\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"fullTime\",\n\t\"name\":\"wulala\",\n\t\"jobTitle\":\"superman\",\n\t\"phoneNumber\":\"+886912345679\"\n\t\n}"
+					"raw": "{\n\t\"gender\":\"male\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"fullTime\",\n\t\"name\":\"wahaha\",\n\t\"jobTitle\":\"ironman\",\n\t\"phoneNumber\":\"+886912345678\"\n\t\n}"
 				},
 				"url": {
 					"raw": "{{host}}/register",
@@ -192,24 +192,13 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
+						"value": "application/json",
 						"type": "text"
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "title",
-							"value": "系統測試2",
-							"type": "text"
-						},
-						{
-							"key": "detail",
-							"value": "天阿 快做好了",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": "{\n\t\"title\":\"測試公告\",\n\t\"detail\":\"系統快完成拉\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/addAnnouncement",
@@ -306,7 +295,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"\",\n\t\"jobTitle\":\"\"\n}"
+					"raw": "{\n\t\"uid\":\" console.log(reason);\n        response.json(resultObj);\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"gaga\",\n\t\"jobTitle\":\"\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/updateUser",
@@ -343,6 +332,90 @@
 					],
 					"path": [
 						"getUserDetail"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/punch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"employer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"employee\":\"Xa9qSXTuOzZjpynAYHVt46MRYlQ2\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/punch",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"punch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/askLeave",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"personalLeave\",\n\t\"startLeaveTime\":1551110400000,\n\t\"endLeaveTime\":1551196800000,\n\t\"desc\":\"我想請假\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/askLeave",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"askLeave"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/getLeaveNoteList",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\n}"
+				},
+				"url": {
+					"raw": "{{host}}/getLeaveNoteList",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getLeaveNoteList"
 					]
 				}
 			},
