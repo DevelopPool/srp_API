@@ -6,7 +6,7 @@ const team = require('./team');
 const util = require('./util');
 const user = require('./user');
 const announcement = require('./announcement');
-
+const leaveNote = require('./leaveNote');
 
 const firestore = admin.firestore();
 const auth = admin.auth();
@@ -25,117 +25,14 @@ exports.getUserDetail = user.getUserDetail;
 
 // });
 
-// exports.getAbsentNoteList = functions.https.onRequest((request, response) => {
+//todo permision check
+exports.getLeaveNoteList = leaveNote.getLeaveNoteList;
 
-// });
-
-exports.askLeave = functions.https.onRequest((request, response) => {
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    defaultValue = " ";
-
-    let issuerUID = util.checkEmpty(request.body.issuer) ? request.body.issuer : defaultValue;
-    let type = util.checkEmpty(request.body.type) ? request.body.type : defaultValue;
-    let desc = util.checkEmpty(request.body.desc) ? request.body.desc : defaultValue;
-    let startLeaveTime = util.checkEmpty(request.body.startLeaveTime) ? request.body.startLeaveTime : defaultValue;
-    let endLeaveTime = util.checkEmpty(request.body.endLeaveTime) ? request.body.endLeaveTime : defaultValue;
-
-    let LeaveTimeCheck = new Promise((resolve, reject) => {
-
-
-        if (!Number.isInteger(startLeaveTime)) {
-            return reject('startLeaveTime format error');
-        }
-
-        if (!Number.isInteger(endLeaveTime)) {
-            return reject('endLeaveTime format error');
-        }
-        if (startLeaveTime > endLeaveTime) {
-            return reject('leave time order error');
-        }
-        return resolve('LeaveTimeCheck pass')
-        // let startTime = new Date(startLeaveTime);
-        // let endTime = new Date(endLeaveTime);
-        // if (endTime < startTime) {
-        //     return Promise.reject('endLeaveTime smaller than startLeaveTime');
-        // }
-        // else {
-        //     return Promise.resolve();
-        // }
-    })
-
-    let typeCheck = firestore.collection(util.tables.leaveType.tableName).doc(type).get().then(doc => {
-        //leaveType是否存在
-        if (!doc.exists) {
-            return Promise.reject(`${type} does not exists`)
-        }
-        else {
-            return Promise.resolve(doc);
-        }
-    });
-
-    let issuerCheck = firestore.collection(util.tables.users.tableName).doc(issuerUID).get().then(doc => {
-        //issuer是否存在
-        if (!doc.exists) {
-            return Promise.reject(`${issuerUID} does not exists`)
-        }
-        else {
-            return Promise.resolve(doc);
-        }
-    });
-
-
-    let today = Date.now();
-    let date = new Date();
-    today -= date.getMilliseconds();
-    today -= date.getSeconds() * 1000;
-    today -= date.getMinutes() * 60 * 1000;
-    today -= date.getHours() * 60 * 60 * 1000;
-
-    let issuerLoginCheck = firestore.collection(util.tables.loginRecord.tableName)
-        .where(util.tables.loginRecord.columns.uid, '==', issuerUID)
-        .where(util.tables.loginRecord.columns.loginTime, '>', new Date(today))
-        .orderBy(util.tables.loginRecord.columns.loginTime, 'desc')
-        .get().then(snapshot => {
-            // snapshot.forEach(result=>{
-            //     console.log(result.data());
-            // })
-            if (snapshot.empty) {
-                return Promise.reject(`${issuerUID} login check fail`);
-            }
-            else {
-                return Promise.resolve(`${issuerUID} login check pass`);
-            }
-        });
-
-    Promise.all([issuerCheck, issuerLoginCheck, typeCheck, LeaveTimeCheck]).then(values => {
-        //寫入資料庫
-        let leaveNoteColumns = util.tables.leaveNote.columns;
-        let newLeaveNote = {};
-        newLeaveNote[leaveNoteColumns.issuer] = issuerUID;
-        newLeaveNote[leaveNoteColumns.type] = type;
-        newLeaveNote[leaveNoteColumns.issueTime] = Date.now();
-        newLeaveNote[leaveNoteColumns.startLeaveTime] = new Date(startLeaveTime);
-        newLeaveNote[leaveNoteColumns.endLeaveTime] = new Date(endLeaveTime);
-        newLeaveNote[leaveNoteColumns.desc] = desc;
-        console.log(newLeaveNote);
-        return firestore.collection(util.tables.leaveNote.tableName).add(newLeaveNote);
-
-    }).then(doc => {
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        console.log(reason);
-        response.json(resultObj);
-    });
-});
+exports.askLeave = leaveNote.askLeave;
 
 
 
-// exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
-
-// });
+exports.authorizeAbsentNote = leaveNote.askLeave;
 
 exports.punch = functions.https.onRequest((request, response) => {
     let resultObj = {
