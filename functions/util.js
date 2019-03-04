@@ -8,25 +8,37 @@ exports.checkEmpty = function checkEmpty(uncheckedValue) {
 }
 
 exports.tables = {
-    leaveType:{
-        tableName:'leaveType',
-        columns:{
-            showName:'showName',
+    workAssignment: {
+        tableName: 'workAssignment',
+        columns: {
+            team: 'team',
+            workType: 'workType',
+            workTime: 'worktime',
+            desc: 'desc',
+            worker: 'worker',
+            modifyUser: 'modifyUser',
+            modifyTime: 'modifyTime',
+        }
+    },
+    leaveType: {
+        tableName: 'leaveType',
+        columns: {
+            showName: 'showName',
         }
     },
     leaveNote: {
         tableName: 'leaveNote',
         columns: {
-            issuer:"issuer",
-            authorizer:"authorizer",
-            issueTime:"issueTime",
-            authTime:'authTime',
-            type:"type",
-            desc:"description",
-            startLeaveTime:"startLeaveTime",
-            endLeaveTime:"endLeaveTime",
-            is_approved:"is_approved",
-            approve_desc:"approveDescription"
+            issuer: "issuer",
+            authorizer: "authorizer",
+            issueTime: "issueTime",
+            authTime: 'authTime',
+            type: "type",
+            desc: "description",
+            startLeaveTime: "startLeaveTime",
+            endLeaveTime: "endLeaveTime",
+            is_approved: "is_approved",
+            approve_desc: "approveDescription"
         }
     },
     punchRecord: {

@@ -57,3 +57,21 @@ exports.getTeamList = functions.https.onRequest((request, response) => {
 
     })
 });
+
+let teamCheck = function (teamName) {
+
+}
+
+exports.check = {
+    teamExistCheck: function (teamName) {
+        return admin.firestore().collection(util.tables.team.tableName).doc(teamName).get().then(doc => {
+            if (!doc.exists) {
+                return Promise.reject(`${teamName} doesn't exist`);
+            }
+            return Promise.resolve('team check pass');
+        });
+    },
+}
+
+
+

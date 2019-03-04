@@ -244,7 +244,7 @@ exports.updateUser = functions.https.onRequest((request, response) => {
             jobTitle: _jobTitle,
             team: _team,
             workingType: _workingType,
-            verified:_verified,
+            verified: _verified,
         });
     }).then(() => {
         resultObj.excutionResult = 'success';
@@ -277,7 +277,7 @@ exports.getUserDetail = functions.https.onRequest((request, response) => {
     }).then((doc) => {
         let data = doc.data();
         delete data.permission;
-        resultObj.userData =  data;
+        resultObj.userData = data;
         resultObj.excutionResult = 'success';
         response.json(resultObj);
     }).catch(reason => {
@@ -287,3 +287,38 @@ exports.getUserDetail = functions.https.onRequest((request, response) => {
 
 
 });
+
+//登入確認
+exports.loginCheck = function (userID) {
+    let today = Date.now();
+    let date = new Date();
+    today -= date.getMilliseconds();
+    today -= date.getSeconds() * 1000;
+    today -= date.getMinutes() * 60 * 1000;
+    today -= date.getHours() * 60 * 60 * 1000;
+    let loginCheck = firestore.collection(util.tables.loginRecord.tableName)
+        .where(util.tables.loginRecord.columns.uid, '==', userID)
+        .where(util.tables.loginRecord.columns.loginTime, '>', new Date(today))
+        .orderBy(util.tables.loginRecord.columns.loginTime, 'desc')
+        .get().then(snapshot => {
+
+            if (snapshot.empty) {
+                return Promise.reject(`${authorizerUID} login check fail`);
+            }
+            else {
+                return Promise.resolve(`${authorizerUID} login check pass`);
+            }
+        });
+    return loginCheck
+}
+
+exports.uidCheck = function(uid){
+    firestore.collection(util.tables.users.tableName).doc(uid).get().then(doc => {
+        if (!doc.exists) {
+            return Promise.reject(`${uid} does not exists`)
+        }
+        else {
+            return Promise.resolve(doc);
+        }
+    })
+}

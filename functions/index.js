@@ -17,9 +17,39 @@ exports.checkLogin = user.checkLogin;
 exports.updateUser = user.updateUser;
 exports.getUserDetail = user.getUserDetail;
 
-// exports.addWork = functions.https.onRequest((request, response) => {
+exports.addWork = functions.https.onRequest((request, response) => {
+    defaultValue = " ";
+    let _team = util.checkEmpty(request.body.team) ? request.body.team : defaultValue ;
+    let _workType = util.checkEmpty(request.body.workType) ? request.body.team : defaultValue ;
+    let _workTime = util.checkEmpty(request.body.workTime) ? request.body.workTime : defaultValue ;
+    let _desc = util.checkEmpty(request.body.desc) ? request.body.desc : defaultValue ;
+    let _workder = util.checkEmpty(request.body.workder) ? request.body.workder : [];
+    let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : [];
+    
+    //check user 存在
+    let uidCheck = user.uidCheck(_uid);
 
-// });
+    //login check
+    let loginCheck = user.loginCheck(_uid);
+
+    //確認team存在
+    let teamCheck = team.check.teamExistCheck(_team);
+
+    let paracheck = new Promise((resolve,reject)=>{
+        if(_workTime === " "){
+            return reject('parameter format error')
+        }if(_workType === " "){
+            return reject('parameter format error')
+        }
+        return resolve('parameter check pass');
+    });
+    //  todo
+    let workerExistCheck = true;
+
+    Promise.all([uidCheck,loginCheck,teamCheck]).then(valuse=>{
+
+    })
+});
 
 // exports.getWork = functions.https.onRequest((request, response) => {
 
