@@ -379,7 +379,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"personalLeave\",\n\t\"startLeaveTime\":1551110400000,\n\t\"endLeaveTime\":1551196800000,\n\t\"desc\":\"我想請假\"\n}"
+					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"personalLeave\",\n\t\"startLeaveTime\":1551110400000,\n\t\"endLeaveTime\":1551196800000,\n\t\"desc\":\"測試假單2\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/askLeave",
@@ -407,7 +407,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\n\t\n}"
+					"raw": "{\n\t\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"unAuthNotes\":true,\n\t\"authedNotes\":true,\n\t\"offset\":0,\n\t\"limit\":5\n\t\n\t\n}"
 				},
 				"url": {
 					"raw": "{{host}}/getLeaveNoteList",
@@ -416,6 +416,34 @@
 					],
 					"path": [
 						"getLeaveNoteList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/authorizeAbsentNote",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"leaveNoteUID\":\"oNhr8tNtDzhi2Zcs1uJQ\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"免強通過\",\n\t\"is_proved\":true\n\n}"
+				},
+				"url": {
+					"raw": "{{host}}/authorizeAbsentNote",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"authorizeAbsentNote"
 					]
 				}
 			},
