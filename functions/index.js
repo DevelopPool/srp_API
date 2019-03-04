@@ -32,7 +32,7 @@ exports.askLeave = leaveNote.askLeave;
 
 
 
-exports.authorizeAbsentNote = leaveNote.askLeave;
+exports.authorizeAbsentNote = leaveNote.authorizeAbsentNote;
 
 exports.punch = functions.https.onRequest((request, response) => {
     let resultObj = {

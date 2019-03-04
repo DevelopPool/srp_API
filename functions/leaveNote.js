@@ -82,7 +82,7 @@ exports.askLeave = functions.https.onRequest((request, response) => {
         let newLeaveNote = {};
         newLeaveNote[leaveNoteColumns.issuer] = issuerUID;
         newLeaveNote[leaveNoteColumns.type] = type;
-        newLeaveNote[leaveNoteColumns.issueTime] = Date.now();
+        newLeaveNote[leaveNoteColumns.issueTime] = new Date();
         newLeaveNote[leaveNoteColumns.startLeaveTime] = new Date(startLeaveTime);
         newLeaveNote[leaveNoteColumns.endLeaveTime] = new Date(endLeaveTime);
         newLeaveNote[leaveNoteColumns.desc] = desc;
@@ -131,7 +131,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
     today -= date.getMinutes() * 60 * 1000;
     today -= date.getHours() * 60 * 60 * 1000;
 
-    let LoginCheck = firestore.collection(util.tables.loginRecord.tableName)
+    let loginCheck = firestore.collection(util.tables.loginRecord.tableName)
         .where(util.tables.loginRecord.columns.uid, '==', uid)
         .where(util.tables.loginRecord.columns.loginTime, '>', new Date(today))
         .orderBy(util.tables.loginRecord.columns.loginTime, 'desc')
@@ -158,10 +158,9 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
     //todo
     let permisionCheck = true;
 
-    Promise.all([uidCheck, LoginCheck, permisionCheck, paraCheck]).then(values => {
-        let query = firestore.collection(util.tables.leaveNote.tableName)
+    Promise.all([uidCheck, loginCheck, permisionCheck, paraCheck]).then(values => {
         if (!unAuthNotes && authedNotes) {
-            console.log('gaga');
+
             return firestore.collection(util.tables.leaveNote.tableName)
                 .where(util.tables.leaveNote.columns.is_approved, '==', true)
                 .orderBy(util.tables.leaveNote.columns.authTime)
@@ -170,11 +169,11 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
                 .get();
         }
         else if (unAuthNotes && !authedNotes) {
-            console.log('wuwu');
+
 
             return firestore.collection(util.tables.leaveNote.tableName)
                 .where(util.tables.leaveNote.columns.is_approved, '==', false)
-                .orderBy(util.tables.leaveNote.columns.issueTime )
+                .orderBy(util.tables.leaveNote.columns.issueTime)
                 .offset(offset)
                 .limit(limit)
                 .get();
@@ -189,7 +188,9 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
     }).then(snapshot => {
         resultObj.leaveNote = [];
         snapshot.forEach(result => {
-            resultObj.leaveNote.push(result.data());
+            let newData = result.data();
+            newData['uid'] = result.id;
+            resultObj.leaveNote.push(newData);
         })
         resultObj.excutionResult = 'success';
         response.json(resultObj);
@@ -210,5 +211,74 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
     };
     defaultValue = " ";
 
+    let leaveNoteUID = util.checkEmpty(request.body.leaveNoteUID) ? request.body.leaveNoteUID : defaultValue;
+    let authorizerUID = util.checkEmpty(request.body.authorizerUID) ? request.body.authorizerUID : defaultValue;
+    let authDesc = util.checkEmpty(request.body.approve_desc) ? request.body.approve_desc : defaultValue;
+    let is_proved = util.checkEmpty(request.body.is_proved) ? request.body.is_proved : defaultValue;
 
+    //確認leaveNote存在
+
+    //登入確認
+    let today = Date.now();
+    let date = new Date();
+    today -= date.getMilliseconds();
+    today -= date.getSeconds() * 1000;
+    today -= date.getMinutes() * 60 * 1000;
+    today -= date.getHours() * 60 * 60 * 1000;
+    let loginCheck = firestore.collection(util.tables.loginRecord.tableName)
+        .where(util.tables.loginRecord.columns.uid, '==', authorizerUID)
+        .where(util.tables.loginRecord.columns.loginTime, '>', new Date(today))
+        .orderBy(util.tables.loginRecord.columns.loginTime, 'desc')
+        .get().then(snapshot => {
+
+            if (snapshot.empty) {
+                return Promise.reject(`${authorizerUID} login check fail`);
+            }
+            else {
+                return Promise.resolve(`${authorizerUID} login check pass`);
+            }
+        });
+    //確認UID 存在
+    let uidCheck = firestore.collection(util.tables.users.tableName).doc(authorizerUID).get().then(doc => {
+        if (!doc.exists) {
+            return Promise.reject(`${authorizerUID} does not exists`)
+        }
+        else {
+            return Promise.resolve(doc);
+        }
+    })
+
+    //權限確認 todo
+    let permisionCheck = true;
+
+    //確認prove型別
+    let paraCheck = new Promise((resolve, reject) => {
+        if (is_proved === null) {
+
+            return reject('parameter format error');
+        }
+        if (typeof (is_proved) !== 'boolean') {
+            return reject('parameter type error');
+        }
+        return resolve('paraCheck pass');
+    })
+
+    Promise.all([paraCheck, permisionCheck, uidCheck, loginCheck]).then(values => {
+        console.log('gaga')
+        let leaveNoteColumns = util.tables.leaveNote.columns;
+        let newData = {};
+        newData[leaveNoteColumns.authTime] = new Date();
+        newData[leaveNoteColumns.authorizer] = authorizerUID;
+        newData[leaveNoteColumns.approve_desc] = authDesc;
+        newData[leaveNoteColumns.is_approved] = is_proved;
+
+
+        return firestore.collection(util.tables.leaveNote.tableName).doc(leaveNoteUID).update(newData);
+    }).then(doc => {
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason);
+        response.json(resultObj);
+    });
 });
