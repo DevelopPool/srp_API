@@ -448,6 +448,62 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "\b{{host}}/addWork",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"team\":\"team101\",\n\t\"workType\":\"1\",\n\t\"workTime\":\"上午\",\n\t\"desc\":\"1\",\n\t\"worker\":[\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"],\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/addWork",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"addWork"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/getWork",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/getWork",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getWork"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
