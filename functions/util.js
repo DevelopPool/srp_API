@@ -90,3 +90,6 @@ exports.tables = {
         }
     },
 }
+
+exports.workTime = ['上午','下午','晚上'];
+

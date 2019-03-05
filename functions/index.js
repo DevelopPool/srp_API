@@ -18,12 +18,16 @@ exports.updateUser = user.updateUser;
 exports.getUserDetail = user.getUserDetail;
 
 exports.addWork = functions.https.onRequest((request, response) => {
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+
     defaultValue = " ";
     let _team = util.checkEmpty(request.body.team) ? request.body.team : defaultValue ;
     let _workType = util.checkEmpty(request.body.workType) ? request.body.team : defaultValue ;
     let _workTime = util.checkEmpty(request.body.workTime) ? request.body.workTime : defaultValue ;
     let _desc = util.checkEmpty(request.body.desc) ? request.body.desc : defaultValue ;
-    let _workder = util.checkEmpty(request.body.workder) ? request.body.workder : [];
+    let _worker = util.checkEmpty(request.body.worker) ? request.body.worker : [];
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : [];
     
     //check user 存在
@@ -36,7 +40,7 @@ exports.addWork = functions.https.onRequest((request, response) => {
     let teamCheck = team.check.teamExistCheck(_team);
 
     let paracheck = new Promise((resolve,reject)=>{
-        if(_workTime === " "){
+        if(!util.workTime.includes(_workTime)){
             return reject('parameter format error')
         }if(_workType === " "){
             return reject('parameter format error')
@@ -44,11 +48,46 @@ exports.addWork = functions.https.onRequest((request, response) => {
         return resolve('parameter check pass');
     });
     //  todo
-    let workerExistCheck = true;
+    let workerExistCheck = firestore.collection(util.tables.users.tableName).get().then(snapshot=>{
+        userIDs = [];
+        snapshot.forEach(result=>{
+            userIDs.push(result.id);
+        })
+        let flag = true;
+        _worker.forEach(element => {
+            //console.log(userIDs.includes(element));
+            if(!userIDs.includes(element)){
+               flag = false;
+            }
 
-    Promise.all([uidCheck,loginCheck,teamCheck]).then(valuse=>{
-
+        })
+        console.log(flag);
+        if(flag){
+            return Promise.resolve('worker check pass');
+        }
+        return Promise.reject('worker check fail');
+     
     })
+
+    Promise.all([uidCheck,loginCheck,paracheck,teamCheck,workerExistCheck]).then(valuse=>{
+        let WAColumn  = util.tables.workAssignment.columns;
+        let newAssignment = {};
+        newAssignment[WAColumn.team] = _team;
+        newAssignment[WAColumn.workTime] = _workTime;
+        newAssignment[WAColumn.workTime]=_workTime;
+        newAssignment[WAColumn.desc]=_desc;
+        newAssignment[WAColumn.worker ]=_worker;
+        newAssignment[WAColumn.modifyUser]=_uid;
+        newAssignment[WAColumn.modifyTime]=new Date();
+        return firestore.collection(util.tables.workAssignment.tableName).add(newAssignment)
+    }).then(() => {
+        // 回傳成功
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason);
+        response.json(resultObj);
+    });
 });
 
 // exports.getWork = functions.https.onRequest((request, response) => {

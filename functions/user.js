@@ -303,10 +303,10 @@ exports.loginCheck = function (userID) {
         .get().then(snapshot => {
 
             if (snapshot.empty) {
-                return Promise.reject(`${authorizerUID} login check fail`);
+                return Promise.reject(`${userID} login check fail`);
             }
             else {
-                return Promise.resolve(`${authorizerUID} login check pass`);
+                return Promise.resolve(`${userID} login check pass`);
             }
         });
     return loginCheck

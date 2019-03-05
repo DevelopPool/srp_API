@@ -58,9 +58,7 @@ exports.getTeamList = functions.https.onRequest((request, response) => {
     })
 });
 
-let teamCheck = function (teamName) {
 
-}
 
 exports.check = {
     teamExistCheck: function (teamName) {
