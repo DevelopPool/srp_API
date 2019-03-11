@@ -73,7 +73,7 @@ exports.addWork = functions.https.onRequest((request, response) => {
         let WAColumn = util.tables.workAssignment.columns;
         let newAssignment = {};
         newAssignment[WAColumn.team] = _team;
-        newAssignment[WAColumn.workTime] = _workTime;
+        newAssignment[WAColumn.workType] = _workType;
         newAssignment[WAColumn.workTime] = _workTime;
         newAssignment[WAColumn.desc] = _desc;
         newAssignment[WAColumn.worker] = _worker;
@@ -147,10 +147,10 @@ exports.getWork = functions.https.onRequest((request, response) => {
 
    
 });
+//delete work
 
 //todo permision check
 exports.getLeaveNoteList = leaveNote.getLeaveNoteList;
-
 exports.askLeave = leaveNote.askLeave;
 
 

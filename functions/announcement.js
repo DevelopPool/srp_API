@@ -1,21 +1,28 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const util = require('./util');
-
+const user = require('./user');
 //新增一筆公告事項
 exports.addAnnouncement = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',
     };
-    let defaultValue = "";
+    let defaultValue = " ";
+
     let title = util.checkEmpty(request.body.title) ? request.body.title : defaultValue;
-    let time = admin.firestore.Timestamp.now();
+    let _uid  = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
     let detail = util.checkEmpty(request.body.detail) ? request.body.detail : defaultValue;
 
-    admin.firestore().collection('announcement').add({
-        title: title,
-        time: time,
-        detail: detail,
+    let loginCheck = user.loginCheck(_uid);
+
+    //todo 權限驗證
+    Promise.all([loginCheck]).then(value=>{
+        return admin.firestore().collection('announcement').add({
+            title: title,
+            issueTIme: new Date(),
+            detail: detail,
+            issuer:_uid,
+        })
     }).then(docRef => {
         resultObj.excutionResult = 'success';
         response.json(resultObj);
@@ -29,16 +36,17 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',
     };
-
-    //取第一筆
-    admin.firestore().collection('announcement').orderBy('time', 'desc').limit(1).get().then(snapshot => {
-        resultObj.announcement = {};
+    let today = Date.now();
+    let date = new Date();
+    today -= date.getMilliseconds();
+    today -= date.getSeconds() * 1000;
+    today -= date.getMinutes() * 60 * 1000;
+    today -= date.getHours() * 60 * 60 * 1000;
+   
+    admin.firestore().collection('announcement').where('time',">",new Date(today)).orderBy('time', 'desc').get().then(snapshot => {
+        resultObj.announcement = [];
         snapshot.forEach(doc => {
-            data = doc.data();
-            resultObj.announcement.title = data.title;
-            resultObj.announcement.time = data.time;
-            resultObj.announcement.detail = data.detail;
-            console.log(doc.data());
+            resultObj.announcement.push( doc.data())
         });
         resultObj.excutionResult = 'success';
         response.json(resultObj);
