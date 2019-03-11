@@ -16,7 +16,7 @@ exports.checkLogin = user.checkLogin;
 // exports.logout = user.logout;
 exports.updateUser = user.updateUser;
 exports.getUserDetail = user.getUserDetail;
-
+exports.getUserList = user.getUserList;
 exports.addWork = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',

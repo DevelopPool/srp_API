@@ -295,7 +295,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"uid\":\" console.log(reason);\n        response.json(resultObj);\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"gaga\",\n\t\"jobTitle\":\"\"\n}"
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"modifingUid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"gaga\",\n\t\"jobTitle\":\"superman\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/updateUser",
@@ -435,7 +435,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"leaveNoteUID\":\"oNhr8tNtDzhi2Zcs1uJQ\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"免強通過\",\n\t\"is_proved\":true\n\n}"
+					"raw": "{\n\t\"leaveNoteUID\":\"oNhr8tNtDzhi2Zcs1uJQ\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"免強通過2\",\n\t\"is_proved\":true\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/authorizeAbsentNote",
@@ -463,7 +463,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"team\":\"team101\",\n\t\"workType\":\"1\",\n\t\"workTime\":\"上午\",\n\t\"desc\":\"1\",\n\t\"worker\":[\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"],\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+					"raw": "{\n\t\"team\":\"team101\",\n\t\"workType\":\"1\",\n\t\"workTime\":\"晚上\",\n\t\"desc\":\"1\",\n\t\"worker\":[\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"],\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/addWork",
@@ -500,6 +500,34 @@
 					],
 					"path": [
 						"getWork"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/getUserList",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/getUserList",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getUserList"
 					]
 				}
 			},

@@ -197,13 +197,15 @@ exports.updateUser = functions.https.onRequest((request, response) => {
 
     //normalize
     let defaultValue = " ";
-    let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+    let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue; //動作帳號
+    let _modifingUid = util.checkEmpty(request.body.modifingUid) ? request.body.modifingUid : defaultValue; //欲修改帳號
     let _name = util.checkEmpty(request.body.name) ? request.body.name : defaultValue;
     let _gender = util.checkEmpty(request.body.gender) ? request.body.gender : defaultValue;
     let _jobTitle = util.checkEmpty(request.body.jobTitle) ? request.body.jobTitle : defaultValue;
     let _team = util.checkEmpty(request.body.team) ? request.body.team : defaultValue;
     let _workingType = util.checkEmpty(request.body.workingType) ? request.body.workingType : defaultValue;
     let _verified = true;
+
 
     //確認gender存在
     let genderCheck = firestore.collection(util.tables.gender.tableName).doc(_gender).get().then(snapshot => {
@@ -237,22 +239,48 @@ exports.updateUser = functions.https.onRequest((request, response) => {
         }
     });
 
-    Promise.all([genderCheck, teamCheck, workingTypeCheck]).then(value => {
-        return firestore.collection(util.tables.users.tableName).doc(_uid).update({
-            name: _name,
-            gender: _gender,
-            jobTitle: _jobTitle,
-            team: _team,
-            workingType: _workingType,
-            verified: _verified,
+    //改自己
+    if (_uid === _modifingUid) {
+        Promise.all([genderCheck, teamCheck, workingTypeCheck]).then(value => {
+            return firestore.collection(util.tables.users.tableName).doc(_uid).update({
+                name: _name,
+                gender: _gender,
+                jobTitle: _jobTitle,
+                team: _team,
+                workingType: _workingType,
+                verified: _verified,
+            });
+        }).then(() => {
+            resultObj.excutionResult = 'success';
+            response.json(resultObj);
+        }).catch(reason => {
+            console.log(reason)
+            response.json(resultObj);
         });
-    }).then(() => {
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        console.log(reason)
-        response.json(resultObj);
-    });
+    }
+    //改別人
+    else {
+        let userCheck = _uidCheck(_uid);
+        //todo permisionCheck
+        Promise.all([genderCheck, teamCheck, workingTypeCheck, userCheck]).then(value => {
+            return firestore.collection(util.tables.users.tableName).doc(_modifingUid).update({
+                name: _name,
+                gender: _gender,
+                jobTitle: _jobTitle,
+                team: _team,
+                workingType: _workingType,
+                verified: _verified,
+            });
+        }).then(() => {
+            resultObj.excutionResult = 'success';
+            response.json(resultObj);
+        }).catch(reason => {
+            console.log(reason)
+            response.json(resultObj);
+        });
+    }
+
+
 
 
 
@@ -288,8 +316,44 @@ exports.getUserDetail = functions.https.onRequest((request, response) => {
 
 });
 
+//get userlist
+exports.getUserList = functions.https.onRequest((request, response) => {
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+
+    //normalize
+    let defaultValue = " ";
+    let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+    let loginCheck = _loginCheck(_uid)
+
+    //todo permisionCheck
+
+
+    Promise.all([loginCheck])
+        .then(() => {
+            return firestore.collection(util.tables.users.tableName).get()
+        })
+        .then(snapshot => {
+            users = [];
+            snapshot.forEach(result => {
+                users.push(result.data());
+            })
+            return users;
+        }).then((users) => {
+            resultObj.excutionResult = 'success';
+            resultObj.userList = users;
+            response.json(resultObj);
+        }).catch(reason => {
+            console.log(reason)
+            response.json(resultObj);
+        });
+});
 //登入確認
-exports.loginCheck = function (userID) {
+exports.loginCheck = _loginCheck;
+
+function _loginCheck(userID) {
+    
     let today = Date.now();
     let date = new Date();
     today -= date.getMilliseconds();
@@ -312,7 +376,9 @@ exports.loginCheck = function (userID) {
     return loginCheck
 }
 
-exports.uidCheck = function(uid){
+exports.uidCheck = _uidCheck;
+
+function _uidCheck(uid) {
     firestore.collection(util.tables.users.tableName).doc(uid).get().then(doc => {
         if (!doc.exists) {
             return Promise.reject(`${uid} does not exists`)
