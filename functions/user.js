@@ -61,7 +61,7 @@ exports.register = functions.https.onRequest((request, response) => {
     });
 
     //確認workingType存在
-    let workingTypeCheck = firestore.collection(util.tables.workingType.tableName).doc(_workingType).get().then(snapshot => {
+    let workingTypeCheck = firestore.collection(util.tables.hiringType.tableName).doc(_workingType).get().then(snapshot => {
         if (snapshot.exists) {
             return Promise.resolve('workingType exists');
         }
@@ -230,7 +230,7 @@ exports.updateUser = functions.https.onRequest((request, response) => {
     });
 
     //確認workingType存在
-    let workingTypeCheck = firestore.collection(util.tables.workingType.tableName).doc(_workingType).get().then(snapshot => {
+    let workingTypeCheck = firestore.collection(util.tables.hiringType.tableName).doc(_workingType).get().then(snapshot => {
         if (snapshot.exists) {
             return Promise.resolve('workingType exists');
         }

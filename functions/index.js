@@ -39,11 +39,23 @@ exports.addWork = functions.https.onRequest((request, response) => {
     //確認team存在
     let teamCheck = team.check.teamExistCheck(_team);
 
+    let workTimeCheck = firestore.collection(util.tables.workTime.tableName).get().then(docs => {
+        docIDs = [];
+        docs.forEach(doc => {
+            docIDs.push(doc.id);
+        });
+        return docIDs;
+    })
+        .then(docIDs => {
+            if (!docIDs.includes(_workTime)) {
+                return Promise.reject('workTime format error')
+            }
+            return Promise.resolve('workTime checkpass');
+        })
     let paracheck = new Promise((resolve, reject) => {
-        if (!util.workTime.includes(_workTime)) {
-            return reject('parameter format error')
-        } if (_workType === " ") {
-            return reject('parameter format error')
+
+        if (_workType === " ") {
+            return reject('workType format error')
         }
         return resolve('parameter check pass');
     });
@@ -61,7 +73,7 @@ exports.addWork = functions.https.onRequest((request, response) => {
             }
 
         })
-        console.log(flag);
+
         if (flag) {
             return Promise.resolve('worker check pass');
         }
@@ -69,7 +81,7 @@ exports.addWork = functions.https.onRequest((request, response) => {
 
     })
 
-    Promise.all([uidCheck, loginCheck, paracheck, teamCheck, workerExistCheck]).then(valuse => {
+    Promise.all([uidCheck, loginCheck, paracheck, teamCheck, workerExistCheck, workTimeCheck]).then(valuse => {
         let WAColumn = util.tables.workAssignment.columns;
         let newAssignment = {};
         newAssignment[WAColumn.team] = _team;
@@ -86,6 +98,7 @@ exports.addWork = functions.https.onRequest((request, response) => {
         response.json(resultObj);
     }).catch(reason => {
         console.log(reason);
+        resultObj.reason = reason;
         response.json(resultObj);
     });
 });
@@ -107,45 +120,52 @@ exports.getWork = functions.https.onRequest((request, response) => {
     let loginCheck = user.loginCheck(_uid);
 
     let today = Date.now();
-    today -= new Date().getHours()*60*60*1000;
-    today -= new Date().getMinutes()*60*1000;
-    today -= new Date().getSeconds()*1000;
+    today -= new Date().getHours() * 60 * 60 * 1000;
+    today -= new Date().getMinutes() * 60 * 1000;
+    today -= new Date().getSeconds() * 1000;
 
-    let time = util.workTime[0];
-    if (nowHour >= 0 && nowHour < 12) {
-        time = util.workTime[0];
-    }
-    else if (nowHour >= 12 && nowHour < 18) {
-        time = util.workTime[1];
-    }
-    else {
-        time = util.workTime[2];
-    }
-    Promise.all([uidCheck, loginCheck]).then(valuse => {
+
+    let workTime = firestore.collection(util.tables.workTime.tableName)
+        .where(util.tables.workTime.columns.startHour, '<=', nowHour)
+        .orderBy(util.tables.workTime.columns.startHour, 'desc')
+        .limit(1)
+        .get()
+        .then(docs => {
+
+            docID = ""
+            docs.forEach(doc => {
+                console.log(doc.data());
+                docID = doc.id;
+            })
+
+            return Promise.resolve(docID);
+        })
+
+    Promise.all([uidCheck, loginCheck, workTime]).then(values => {
         let WAColumn = util.tables.workAssignment.columns;
         return firestore.collection(util.tables.workAssignment.tableName)
-        .where(WAColumn.workTime, '==', time)
-        .where(WAColumn.worker,'array-contains',_uid)
-        .where(WAColumn.modifyTime,'>=',new Date(today))
-        .orderBy(WAColumn.modifyTime)
-        .get()
+            .where(WAColumn.workTime, '==', values[2])
+            .where(WAColumn.worker, 'array-contains', _uid)
+            .where(WAColumn.modifyTime, '>=', new Date(today))
+            .orderBy(WAColumn.modifyTime)
+            .get()
     })
-    .then((snap) => {
-        
-        let WA = []
-        snap.forEach((result=>{
-            WA.push(result.data());
-        }))
-        // 回傳成功
-        resultObj.excutionResult = 'success';
-        resultObj['workAssignment'] = WA;
-        response.json(resultObj);
-    }).catch(reason => {
-        console.log(reason);
-        response.json(resultObj);
-    });
+        .then((snap) => {
 
-   
+            let WA = []
+            snap.forEach((result => {
+                WA.push(result.data());
+            }))
+            // 回傳成功
+            resultObj.excutionResult = 'success';
+            resultObj['workAssignment'] = WA;
+            response.json(resultObj);
+        }).catch(reason => {
+            console.log(reason);
+            response.json(resultObj);
+        });
+
+
 });
 //delete work
 

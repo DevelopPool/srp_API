@@ -8,6 +8,14 @@ exports.checkEmpty = function checkEmpty(uncheckedValue) {
 }
 
 exports.tables = {
+    workTime:{
+        tableName:'workTime',
+        columns:{
+            showName:'showName',
+            startHour:'startHour',
+            endHour:'endHour',
+        }
+    },
     workAssignment: {
         tableName: 'workAssignment',
         columns: {
@@ -74,7 +82,7 @@ exports.tables = {
     team: {
         tableName: 'team',
     },
-    workingType: {
+    hiringType: {
         tableName: 'workingType',
         columns: {
             showName: 'showName',
@@ -91,5 +99,4 @@ exports.tables = {
     },
 }
 
-exports.workTime = ['上午','下午','晚上'];
 
