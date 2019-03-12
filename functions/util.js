@@ -8,6 +8,15 @@ exports.checkEmpty = function checkEmpty(uncheckedValue) {
 }
 
 exports.tables = {
+    announcement:{
+        tableName:'announcement',
+        columns:{
+            title: 'title',
+            issueTime: 'issueTime',
+            detail: 'detail',
+            issuer:'issuer',
+        }
+    },
     workTime:{
         tableName:'workTime',
         columns:{
