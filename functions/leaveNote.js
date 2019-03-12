@@ -155,13 +155,17 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
         }
     });
 
+
+
     //todo
     let permisionCheck = true;
 
     Promise.all([uidCheck, loginCheck, permisionCheck, paraCheck]).then(values => {
+        let getLeaveNote = "";
+
         if (!unAuthNotes && authedNotes) {
 
-            return firestore.collection(util.tables.leaveNote.tableName)
+            getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
                 .where(util.tables.leaveNote.columns.is_approved, '==', true)
                 .orderBy(util.tables.leaveNote.columns.authTime)
                 .offset(offset)
@@ -171,7 +175,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
         else if (unAuthNotes && !authedNotes) {
 
 
-            return firestore.collection(util.tables.leaveNote.tableName)
+            getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
                 .where(util.tables.leaveNote.columns.is_approved, '==', false)
                 .orderBy(util.tables.leaveNote.columns.issueTime)
                 .offset(offset)
@@ -179,17 +183,42 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
                 .get();
         }
         else {
-            return firestore.collection(util.tables.leaveNote.tableName)
+            getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
                 .orderBy(util.tables.leaveNote.columns.issueTime)
                 .offset(offset)
                 .limit(limit)
                 .get();
         }
-    }).then(snapshot => {
+
+        let getUserInfo = firestore.collection(util.tables.users.tableName)
+            .get()
+            .then(docs => {
+                let users = {};
+                docs.forEach(user => {
+                    users[user.id] = user.data();
+                })
+                return Promise.resolve(users);
+            })
+
+        return Promise.all([getLeaveNote, getUserInfo]);
+
+    }).then(values => {
+        let users = values[1];
+        let leaveNotes = values[0];
         resultObj.leaveNote = [];
-        snapshot.forEach(result => {
-            let newData = result.data();
-            newData['uid'] = result.id;
+        
+        leaveNotes.forEach(result => {
+           
+            leaveNote = result.data();
+            let newData = {};
+            newData.uid = result.id;
+            newData.type = leaveNote.type;
+            newData.startLeaveTime = leaveNote.startLeaveTime;
+            newData.endLeaveTime=leaveNote.endLeaveTime;
+            newData.issueTime=leaveNote.issueTime;
+            newData.authorized = leaveNote.is_approved;
+            newData.desc = leaveNote.description;
+            newData.issuerName = users[leaveNote.issuer].name;
             resultObj.leaveNote.push(newData);
         })
         resultObj.excutionResult = 'success';
@@ -199,8 +228,6 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
         response.json(resultObj);
     });
 
-
-    //response.json(resultObj);
 
 });
 
