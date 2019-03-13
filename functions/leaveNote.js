@@ -1,7 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const util = require('./util');
-
+const user = require('./user');
 const firestore = admin.firestore();
 
 
@@ -206,16 +206,16 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
         let users = values[1];
         let leaveNotes = values[0];
         resultObj.leaveNote = [];
-        
+
         leaveNotes.forEach(result => {
-           
+
             leaveNote = result.data();
             let newData = {};
             newData.uid = result.id;
             newData.type = leaveNote.type;
             newData.startLeaveTime = leaveNote.startLeaveTime;
-            newData.endLeaveTime=leaveNote.endLeaveTime;
-            newData.issueTime=leaveNote.issueTime;
+            newData.endLeaveTime = leaveNote.endLeaveTime;
+            newData.issueTime = leaveNote.issueTime;
             newData.authorized = leaveNote.is_approved;
             newData.desc = leaveNote.description;
             newData.issuerName = users[leaveNote.issuer].name;
@@ -308,4 +308,61 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
         console.log(reason);
         response.json(resultObj);
     });
+});
+
+
+exports.getMyLeaveNoteList = functions.https.onRequest((request, response) => {
+
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+    defaultValue = " ";
+
+
+    let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+
+
+    let uidCheck = user.uidCheck(uid);
+    let loginCheck = user.loginCheck(uid);
+
+    Promise.all([uidCheck, loginCheck]).then(values => {
+        let unAuthLNs = firestore.collection(util.tables.leaveNote.tableName)
+            .where(util.tables.leaveNote.columns.issuer, '==', uid)
+            .where(util.tables.leaveNote.columns.is_approved, '==', false)
+            .orderBy(util.tables.leaveNote.columns.issueTime, 'desc')
+            .get();
+
+        let futureLNs = firestore.collection(util.tables.leaveNote.tableName)
+            .where(util.tables.leaveNote.columns.issuer, '==', uid)
+            .where(util.tables.leaveNote.columns.is_approved,'==',true) 
+            .where(util.tables.leaveNote.columns.startLeaveTime,'>=',new Date()) 
+            .orderBy(util.tables.leaveNote.columns.startLeaveTime,'desc')
+            .get();
+
+        return Promise.all([unAuthLNs, futureLNs]);
+    }).then(values => {
+        let unAuthLNs = values[0];
+        let futureLNs = values[1];
+
+        let returnLNs = []
+        unAuthLNs.forEach(LN => {
+            let _LN = LN.data();
+            _LN.id = LN.id;
+            returnLNs.push(_LN);
+            //console.log(LNs.data());
+        })
+        futureLNs.forEach(LN => {
+            let _LN = LN.data();
+            _LN.id = LN.id;
+            returnLNs.push(_LN);
+        })
+        resultObj.leaveNotes=returnLNs;
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason);
+        response.json(resultObj);
+    });
+
+
 });

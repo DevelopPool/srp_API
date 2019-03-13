@@ -170,6 +170,8 @@ exports.getWork = functions.https.onRequest((request, response) => {
 //delete work
 
 //todo permision check
+
+exports.getMyLeaveNoteList = leaveNote.getMyLeaveNoteList;
 exports.getLeaveNoteList = leaveNote.getLeaveNoteList;
 exports.askLeave = leaveNote.askLeave;
 
