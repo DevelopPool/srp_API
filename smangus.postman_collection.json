@@ -220,26 +220,13 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
+						"value": "application/json",
 						"type": "text"
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "title",
-							"value": "系統測試2",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "detail",
-							"value": "天阿 快做好了",
-							"type": "text",
-							"disabled": true
-						}
-					]
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/getAnnouncement",
@@ -379,7 +366,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"personalLeave\",\n\t\"startLeaveTime\":1551110400000,\n\t\"endLeaveTime\":1551196800000,\n\t\"desc\":\"測試假單2\"\n}"
+					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"事假\",\n\t\"startLeaveTime\":1552469087066,\n\t\"endLeaveTime\":1552499087066,\n\t\"desc\":\"測試假單2\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/askLeave",
@@ -435,7 +422,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"leaveNoteUID\":\"oNhr8tNtDzhi2Zcs1uJQ\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"免強通過2\",\n\t\"is_proved\":true\n\n}"
+					"raw": "{\n\t\"leaveNoteUID\":\"1gltwBOKiHZb5qe0lBl6\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"免強通過2\",\n\t\"is_proved\":true\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/authorizeAbsentNote",
@@ -528,6 +515,34 @@
 					],
 					"path": [
 						"getUserList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/getMyLeaveNoteList",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/getMyLeaveNoteList",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getMyLeaveNoteList"
 					]
 				}
 			},
