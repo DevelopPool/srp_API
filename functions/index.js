@@ -287,8 +287,6 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
 
     Promise.all([uidCheck, loginCheck, paracheck, genderCheck]).then(() => {
 
-        console.log(year + " " + mounth);
-        console.log(nextYear + " " + nextMounth);
         let punchRecord = firestore.collection(util.tables.punchRecord.tableName)
             .where(util.tables.punchRecord.columns.punchTime, '>=', new Date(year, mounth, 1))
             .where(util.tables.punchRecord.columns.punchTime, '<', new Date(nextYear, nextMounth, 1))
@@ -302,7 +300,6 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
             .orderBy(util.tables.leaveNote.columns.startLeaveTime)
             .get();
 
-        console.log(new Date(year, mounth));
 
         let users = firestore.collection(util.tables.users.tableName)
             .where(util.tables.users.columns.gender, '==', _gender)
@@ -314,9 +311,9 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
         let absendRecords = values[1];
         let users = values[2];
 
-        let returnData = {}
+        let tempData = {}
         users.forEach(user => {
-            returnData[user.id] = {
+            tempData[user.id] = {
                 name: user.data().name,
                 punch: [],
                 leaveNote: [],
@@ -325,22 +322,32 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
 
         punchRecords.forEach(punch => {
             let _p = punch.data()
-            if (returnData[_p[util.tables.punchRecord.columns.issuer]] !== undefined) {
-                returnData[_p[util.tables.punchRecord.columns.issuer]].punch.push(_p[util.tables.punchRecord.columns.punchTime].toDate());
+            if (tempData[_p[util.tables.punchRecord.columns.issuer]] !== undefined) {
+                tempData[_p[util.tables.punchRecord.columns.issuer]].punch.push(_p[util.tables.punchRecord.columns.punchTime].toDate());
 
             }
         })
 
         absendRecords.forEach(ar => {
             let _ar = ar.data();
-            if (returnData[_ar[util.tables.leaveNote.columns.issuer]] !== undefined) {
-                returnData[_ar[util.tables.leaveNote.columns.issuer]].leaveNote.push({
+            if (tempData[_ar[util.tables.leaveNote.columns.issuer]] !== undefined) {
+                tempData[_ar[util.tables.leaveNote.columns.issuer]].leaveNote.push({
                     startLeaveTime: _ar[util.tables.leaveNote.columns.startLeaveTime].toDate(),
                     endLeaveTime: _ar[util.tables.leaveNote.columns.endLeaveTime].toDate(),
                 })
             }
 
         })
+        returnData = []
+        Object.keys(tempData).map(function(objectKey, index) {
+            returnData.push({
+                name : tempData[objectKey].name,
+                punchRecord : tempData[objectKey].punch,
+                leaveNote:tempData[objectKey].leaveNote
+            })
+            // var value = tempData[objectKey];
+            // console.log(value);
+        });
         resultObj.data = returnData;
         // punchRecords.forEach(punchRecord=>{
         //     console.log(punchRecord.data());
