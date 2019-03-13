@@ -174,10 +174,8 @@ exports.getWork = functions.https.onRequest((request, response) => {
 exports.getMyLeaveNoteList = leaveNote.getMyLeaveNoteList;
 exports.getLeaveNoteList = leaveNote.getLeaveNoteList;
 exports.askLeave = leaveNote.askLeave;
-
-
-
 exports.authorizeAbsentNote = leaveNote.authorizeAbsentNote;
+//exports.deleteMyLeaveNote = leaveNote.deleteMyLeaveNote;
 
 exports.punch = functions.https.onRequest((request, response) => {
     let resultObj = {
@@ -232,6 +230,131 @@ exports.punch = functions.https.onRequest((request, response) => {
         console.log(reason);
         response.json(resultObj);
     });
+
+});
+exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, response) => {
+
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+    defaultValue = " ";
+
+
+    let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+    let mounth = util.checkEmpty(request.body.mounth) ? request.body.mounth : defaultValue;
+    let year = util.checkEmpty(request.body.year) ? request.body.year : defaultValue;
+    let _gender = util.checkEmpty(request.body.gender) ? request.body.gender : defaultValue;
+    let paracheck = new Promise((resolve, reject) => {
+        if (mounth === " ") {
+            return reject('parameter format error , empty')
+        }
+        if (typeof (mounth) !== "number") {
+            return reject('parameter format error , type error')
+        }
+        if (mounth < 1 || mounth > 12) {
+            return reject('parameter format error , logic error')
+        }
+        if (year === " ") {
+            return reject('parameter format error , empty')
+        }
+        if (typeof (year) !== "number") {
+            return reject('parameter format error , type error')
+        }
+
+        return resolve('parameter check pass');
+    });
+
+    let genderCheck = firestore.collection(util.tables.gender.tableName).doc(_gender).get().then(snapshot => {
+        if (snapshot.exists) {
+            return Promise.resolve('gender exists');
+        }
+        else {
+            return Promise.reject('gender does not exists');
+        }
+    });
+    let uidCheck = user.uidCheck(uid);
+    let loginCheck = user.loginCheck(uid);
+
+
+    mounth--;
+    nextMounth = mounth + 1;
+    nextYear = year;
+    if (nextMounth === 13) {
+        nextMounth = 1;
+        nextYear = year + 1;
+    }
+
+
+    Promise.all([uidCheck, loginCheck, paracheck, genderCheck]).then(() => {
+
+        console.log(year + " " + mounth);
+        console.log(nextYear + " " + nextMounth);
+        let punchRecord = firestore.collection(util.tables.punchRecord.tableName)
+            .where(util.tables.punchRecord.columns.punchTime, '>=', new Date(year, mounth, 1))
+            .where(util.tables.punchRecord.columns.punchTime, '<', new Date(nextYear, nextMounth, 1))
+            .orderBy(util.tables.punchRecord.columns.punchTime)
+            .get();
+
+        let absendRecord = firestore.collection(util.tables.leaveNote.tableName)
+            .where(util.tables.leaveNote.columns.startLeaveTime, '>=', new Date(year, mounth, 1))
+            .where(util.tables.leaveNote.columns.startLeaveTime, '<', new Date(nextYear, 4, 1))
+            .where(util.tables.leaveNote.columns.is_approved, '==', true)
+            .orderBy(util.tables.leaveNote.columns.startLeaveTime)
+            .get();
+
+        console.log(new Date(year, mounth));
+
+        let users = firestore.collection(util.tables.users.tableName)
+            .where(util.tables.users.columns.gender, '==', _gender)
+            .get();
+        return Promise.all([punchRecord, absendRecord, users]);
+    }).then((values) => {
+        // 回傳成功
+        let punchRecords = values[0];
+        let absendRecords = values[1];
+        let users = values[2];
+
+        let returnData = {}
+        users.forEach(user => {
+            returnData[user.id] = {
+                name: user.data().name,
+                punch: [],
+                leaveNote: [],
+            }
+        })
+
+        punchRecords.forEach(punch => {
+            let _p = punch.data()
+            if (returnData[_p[util.tables.punchRecord.columns.issuer]] !== undefined) {
+                returnData[_p[util.tables.punchRecord.columns.issuer]].punch.push(_p[util.tables.punchRecord.columns.punchTime].toDate());
+
+            }
+        })
+
+        absendRecords.forEach(ar => {
+            let _ar = ar.data();
+            if (returnData[_ar[util.tables.leaveNote.columns.issuer]] !== undefined) {
+                returnData[_ar[util.tables.leaveNote.columns.issuer]].leaveNote.push({
+                    startLeaveTime: _ar[util.tables.leaveNote.columns.startLeaveTime].toDate(),
+                    endLeaveTime: _ar[util.tables.leaveNote.columns.endLeaveTime].toDate(),
+                })
+            }
+
+        })
+        resultObj.data = returnData;
+        // punchRecords.forEach(punchRecord=>{
+        //     console.log(punchRecord.data());
+        // })
+        // absendRecords.forEach(absendRecord => {
+        //     console.log(absendRecord.data());
+        // })
+        resultObj.excutionResult = 'success';
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason);
+        response.json(resultObj);
+    });
+
 
 });
 

@@ -422,7 +422,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"leaveNoteUID\":\"1gltwBOKiHZb5qe0lBl6\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"免強通過2\",\n\t\"is_proved\":true\n\n}"
+					"raw": "{\n\t\"leaveNoteUID\":\"No1yGIiC8Qzzl0bKjTO7\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"通過\",\n\t\"is_proved\":true\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/authorizeAbsentNote",
@@ -543,6 +543,34 @@
 					],
 					"path": [
 						"getMyLeaveNoteList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}\\getMonthlyAttendanceRecord",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"mounth\":3,\n\t\"year\":2019,\n\t\"gender\":\"male\"\n\n}"
+				},
+				"url": {
+					"raw": "{{host}}/getMonthlyAttendanceRecord",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"getMonthlyAttendanceRecord"
 					]
 				}
 			},
