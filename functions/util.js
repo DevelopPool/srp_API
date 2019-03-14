@@ -71,7 +71,8 @@ exports.tables = {
             startLeaveTime: "startLeaveTime",
             endLeaveTime: "endLeaveTime",
             is_approved: "is_approved",
-            approve_desc: "approveDescription"
+            approve_desc: "approveDescription",
+            authorized:"authorized",
         }
     },
     punchRecord: {

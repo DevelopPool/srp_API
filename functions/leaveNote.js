@@ -88,7 +88,8 @@ exports.askLeave = functions.https.onRequest((request, response) => {
         newLeaveNote[leaveNoteColumns.startLeaveTime] = new Date(startLeaveTime);
         newLeaveNote[leaveNoteColumns.endLeaveTime] = new Date(endLeaveTime);
         newLeaveNote[leaveNoteColumns.desc] = desc;
-        newLeaveNote[leaveNoteColumns.is_approved] = false;
+        newLeaveNote[leaveNoteColumns.authorized] = false;
+        //newLeaveNote[leaveNoteColumns.is_approved] = false;
         return firestore.collection(util.tables.leaveNote.tableName).add(newLeaveNote);
 
     }).then(doc => {
@@ -179,7 +180,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
         if (!unAuthNotes && authedNotes) {
 
             getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
-                .where(util.tables.leaveNote.columns.is_approved, '==', true)
+                .where(util.tables.leaveNote.columns.authorized, '==', true)
                 .orderBy(util.tables.leaveNote.columns.authTime)
                 .offset(offset)
                 .limit(limit)
@@ -189,7 +190,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
 
 
             getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
-                .where(util.tables.leaveNote.columns.is_approved, '==', false)
+                .where(util.tables.leaveNote.columns.authorized, '==', false)
                 .orderBy(util.tables.leaveNote.columns.issueTime)
                 .offset(offset)
                 .limit(limit)
@@ -229,9 +230,11 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
             newData.startLeaveTime = leaveNote.startLeaveTime;
             newData.endLeaveTime = leaveNote.endLeaveTime;
             newData.issueTime = leaveNote.issueTime;
-            newData.authorized = leaveNote.is_approved;
+            newData.authorized = leaveNote.authorized;
+            newData.is_approved = leaveNote.is_approved;
             newData.desc = leaveNote.description;
             newData.issuerName = users[leaveNote.issuer].name;
+            console.log(leaveNote.is_approved);
             resultObj.leaveNote.push(newData);
         })
         resultObj.excutionResult = 'success';
@@ -301,6 +304,7 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
             return reject('parameter format error');
         }
         if (typeof (is_proved) !== 'boolean') {
+            console.log(is_proved);
             return reject('parameter type error');
         }
         return resolve('paraCheck pass');
@@ -314,6 +318,7 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
         newData[leaveNoteColumns.authorizer] = authorizerUID;
         newData[leaveNoteColumns.approve_desc] = authDesc;
         newData[leaveNoteColumns.is_approved] = is_proved;
+        newData[leaveNoteColumns.authorized] = true;
 
 
         return firestore.collection(util.tables.leaveNote.tableName).doc(leaveNoteUID).update(newData);
@@ -344,13 +349,14 @@ exports.getMyLeaveNoteList = functions.https.onRequest((request, response) => {
     Promise.all([uidCheck, loginCheck]).then(values => {
         let unAuthLNs = firestore.collection(util.tables.leaveNote.tableName)
             .where(util.tables.leaveNote.columns.issuer, '==', uid)
-            .where(util.tables.leaveNote.columns.is_approved, '==', false)
+            .where(util.tables.leaveNote.columns.authorized, '==', false)
             .orderBy(util.tables.leaveNote.columns.issueTime, 'desc')
             .get();
 
         let futureLNs = firestore.collection(util.tables.leaveNote.tableName)
             .where(util.tables.leaveNote.columns.issuer, '==', uid)
-            .where(util.tables.leaveNote.columns.is_approved,'==',true) 
+            .where(util.tables.leaveNote.columns.is_approved, '==', true)
+            .where(util.tables.leaveNote.columns.authorized,'==',true) 
             .where(util.tables.leaveNote.columns.startLeaveTime,'>=',new Date()) 
             .orderBy(util.tables.leaveNote.columns.startLeaveTime,'desc')
             .get();
@@ -383,29 +389,29 @@ exports.getMyLeaveNoteList = functions.https.onRequest((request, response) => {
 
 });
 
-exports.deleteMyLeaveNote = functions.https.onRequest((request, response) => {
+// exports.deleteMyLeaveNote = functions.https.onRequest((request, response) => {
 
-    let resultObj = {
-        excutionResult: 'fail',
-    };
-    defaultValue = " ";
-
-
-    let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
-    let LNid = util.checkEmpty(request.body.LeaveNoteID) ? request.body.LeaveNoteID : defaultValue;
-
-    let uidCheck = user.uidCheck(uid);
-    let loginCheck = user.loginCheck(uid);
-
-    Promise.all([uidCheck, loginCheck]).then(values => {
-        return firestore.collection(util.tables.leaveNote.tableName).doc(LNid).delete();
-    }).then(values => {
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        console.log(reason);
-        response.json(resultObj);
-    });
+//     let resultObj = {
+//         excutionResult: 'fail',
+//     };
+//     defaultValue = " ";
 
 
-});
+//     let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+//     let LNid = util.checkEmpty(request.body.LeaveNoteID) ? request.body.LeaveNoteID : defaultValue;
+
+//     let uidCheck = user.uidCheck(uid);
+//     let loginCheck = user.loginCheck(uid);
+
+//     Promise.all([uidCheck, loginCheck]).then(values => {
+//         return firestore.collection(util.tables.leaveNote.tableName).doc(LNid).delete();
+//     }).then(values => {
+//         resultObj.excutionResult = 'success';
+//         response.json(resultObj);
+//     }).catch(reason => {
+//         console.log(reason);
+//         response.json(resultObj);
+//     });
+
+
+// });
