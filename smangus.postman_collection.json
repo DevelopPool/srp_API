@@ -394,7 +394,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"unAuthNotes\":true,\n\t\"authedNotes\":true,\n\t\"offset\":0,\n\t\"limit\":5\n\t\n\t\n}"
+					"raw": "{\n\t\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"unAuthNotes\":false,\n\t\"authedNotes\":true,\n\t\"offset\":0,\n\t\"limit\":0\n\t\n\t\n}"
 				},
 				"url": {
 					"raw": "{{host}}/getLeaveNoteList",
@@ -422,7 +422,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"leaveNoteUID\":\"No1yGIiC8Qzzl0bKjTO7\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"通過\",\n\t\"is_proved\":true\n\n}"
+					"raw": "{\n\t\"leaveNoteUID\":\"jEJpyTCEtdEZl3i2kVRO\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"通過\",\n\t\"is_proved\":true\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/authorizeAbsentNote",
@@ -450,7 +450,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "\n{\n    \"team\":\"生態組\",\n    \"workType\":\"1\",\n    \"workTime\":\"下午\",\n    \"desc\":\"砍樹\",\n    \"worker\":[\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"],\n    \"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+					"raw": "\n{\n    \"team\":\"生態組\",\n    \"workType\":\"234\",\n    \"workTime\":\"晚上\",\n    \"desc\":\"砍樹\",\n    \"worker\":[\"+886912345679\"],\n    \"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/addWork",
@@ -562,7 +562,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"mounth\":3,\n\t\"year\":2019,\n\t\"gender\":\"male\"\n\n}"
+					"raw": "{\n\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"mounth\":3,\n\t\"year\":2019,\n\t\"gender\":\"female\"\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/getMonthlyAttendanceRecord",

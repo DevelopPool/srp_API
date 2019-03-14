@@ -102,8 +102,7 @@ exports.askLeave = functions.https.onRequest((request, response) => {
 });
 
 exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
-    console.log("getHours=>"+new Date().getHours());
-    console.log("getUTCHours=>"+new Date().getUTCHours());
+
     let resultObj = {
         excutionResult: 'fail',
     };
@@ -114,7 +113,6 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
     let authedNotes = request.body.authedNotes;
     let offset = util.checkEmpty(request.body.offset) ? request.body.offset : 0;
     let limit = util.checkEmpty(request.body.limit) ? request.body.limit : 10;
-
     let paraCheck = new Promise((resolve, reject) => {
 
         if (typeof (unAuthNotes) !== 'boolean') {
@@ -234,7 +232,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
             newData.is_approved = leaveNote.is_approved;
             newData.desc = leaveNote.description;
             newData.issuerName = users[leaveNote.issuer].name;
-            console.log(leaveNote.is_approved);
+
             resultObj.leaveNote.push(newData);
         })
         resultObj.excutionResult = 'success';
@@ -257,8 +255,7 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
     let leaveNoteUID = util.checkEmpty(request.body.leaveNoteUID) ? request.body.leaveNoteUID : defaultValue;
     let authorizerUID = util.checkEmpty(request.body.authorizerUID) ? request.body.authorizerUID : defaultValue;
     let authDesc = util.checkEmpty(request.body.approve_desc) ? request.body.approve_desc : defaultValue;
-    let is_proved = util.checkEmpty(request.body.is_proved) ? request.body.is_proved : defaultValue;
-
+    let is_proved = request.body.is_proved ;
     //確認leaveNote存在
 
     //登入確認
@@ -293,7 +290,7 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
     //     }
     // })
     let uidCheck = user.uidCheck(authorizerUID);
-    
+
     //權限確認 todo
     let permisionCheck = true;
 
@@ -304,14 +301,13 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
             return reject('parameter format error');
         }
         if (typeof (is_proved) !== 'boolean') {
-            console.log(is_proved);
             return reject('parameter type error');
         }
         return resolve('paraCheck pass');
     })
 
     Promise.all([paraCheck, permisionCheck, uidCheck, loginCheck]).then(values => {
-       
+
         let leaveNoteColumns = util.tables.leaveNote.columns;
         let newData = {};
         newData[leaveNoteColumns.authTime] = new Date();
@@ -356,9 +352,9 @@ exports.getMyLeaveNoteList = functions.https.onRequest((request, response) => {
         let futureLNs = firestore.collection(util.tables.leaveNote.tableName)
             .where(util.tables.leaveNote.columns.issuer, '==', uid)
             .where(util.tables.leaveNote.columns.is_approved, '==', true)
-            .where(util.tables.leaveNote.columns.authorized,'==',true) 
-            .where(util.tables.leaveNote.columns.startLeaveTime,'>=',new Date()) 
-            .orderBy(util.tables.leaveNote.columns.startLeaveTime,'desc')
+            .where(util.tables.leaveNote.columns.authorized, '==', true)
+            .where(util.tables.leaveNote.columns.startLeaveTime, '>=', new Date())
+            .orderBy(util.tables.leaveNote.columns.startLeaveTime, 'desc')
             .get();
 
         return Promise.all([unAuthLNs, futureLNs]);
@@ -371,14 +367,13 @@ exports.getMyLeaveNoteList = functions.https.onRequest((request, response) => {
             let _LN = LN.data();
             _LN.id = LN.id;
             returnLNs.push(_LN);
-            //console.log(LNs.data());
         })
         futureLNs.forEach(LN => {
             let _LN = LN.data();
             _LN.id = LN.id;
             returnLNs.push(_LN);
         })
-        resultObj.leaveNotes=returnLNs;
+        resultObj.leaveNotes = returnLNs;
         resultObj.excutionResult = 'success';
         response.json(resultObj);
     }).catch(reason => {
