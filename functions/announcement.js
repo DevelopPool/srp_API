@@ -40,12 +40,12 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
     let resultObj = {
         excutionResult: 'fail',
     };
-    let today = Date.now();
-    let date = new Date();
-    today -= date.getMilliseconds();
-    today -= date.getSeconds() * 1000;
-    today -= date.getMinutes() * 60 * 1000;
-    today -= date.getHours() * 60 * 60 * 1000;
+    // let today = Date.now();
+    // let date = new Date();
+    // today -= date.getMilliseconds();
+    // today -= date.getSeconds() * 1000;
+    // today -= date.getMinutes() * 60 * 1000;
+    // today -= date.getHours() * 60 * 60 * 1000;
 
     let getUserInfo = admin.firestore().collection(util.tables.users.tableName)
         .get()
@@ -58,7 +58,7 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
         });
 
     let getAnnouncement = admin.firestore().collection(util.tables.announcement.tableName)
-    .where(util.tables.announcement.columns.issueTime, ">", new Date(today))
+    .where(util.tables.announcement.columns.issueTime, ">", new Date(util.getMidNightUTCSeconds()))
     .orderBy(util.tables.announcement.columns.issueTime, 'desc')
     .get();
 

@@ -109,8 +109,12 @@ exports.getWork = functions.https.onRequest((request, response) => {
     };
 
     defaultValue = " ";
-
-    let nowHour = new Date().getHours();
+    //todo 時區問題待修正
+    let nowHour = new Date().getUTCHours()+8;
+    if(nowHour >= 24){
+        nowHour -=24;
+    }
+    console.log(nowHour);
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
 
     //check user 存在
@@ -118,11 +122,10 @@ exports.getWork = functions.https.onRequest((request, response) => {
 
     //login check
     let loginCheck = user.loginCheck(_uid);
-
-    let today = Date.now();
-    today -= new Date().getHours() * 60 * 60 * 1000;
-    today -= new Date().getMinutes() * 60 * 1000;
-    today -= new Date().getSeconds() * 1000;
+    // let today = Date.now();
+    // today -= new Date().getHours() * 60 * 60 * 1000;
+    // today -= new Date().getMinutes() * 60 * 1000;
+    // today -= new Date().getSeconds() * 1000;
 
 
     let workTime = firestore.collection(util.tables.workTime.tableName)
@@ -142,28 +145,27 @@ exports.getWork = functions.https.onRequest((request, response) => {
         })
 
     Promise.all([uidCheck, loginCheck, workTime]).then(values => {
+        console.log(values[2]);
         let WAColumn = util.tables.workAssignment.columns;
         return firestore.collection(util.tables.workAssignment.tableName)
             .where(WAColumn.workTime, '==', values[2])
             .where(WAColumn.worker, 'array-contains', _uid)
-            .where(WAColumn.modifyTime, '>=', new Date(today))
+            .where(WAColumn.modifyTime, '>=', new Date(util.getMidNightUTCSeconds()))
             .orderBy(WAColumn.modifyTime)
             .get()
-    })
-        .then((snap) => {
-
-            let WA = []
-            snap.forEach((result => {
-                WA.push(result.data());
-            }))
-            // 回傳成功
-            resultObj.excutionResult = 'success';
-            resultObj['workAssignment'] = WA;
-            response.json(resultObj);
-        }).catch(reason => {
-            console.log(reason);
-            response.json(resultObj);
-        });
+    }).then((snap) => {
+        let WA = []
+        snap.forEach((result => {
+            WA.push(result.data());
+        }))
+        // 回傳成功
+        resultObj.excutionResult = 'success';
+        resultObj['workAssignment'] = WA;
+        response.json(resultObj);
+    }).catch(reason => {
+        console.log(reason);
+        response.json(resultObj);
+    });
 
 
 });
@@ -323,7 +325,7 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
         punchRecords.forEach(punch => {
             let _p = punch.data()
             if (tempData[_p[util.tables.punchRecord.columns.issuer]] !== undefined) {
-                tempData[_p[util.tables.punchRecord.columns.issuer]].punch.push(_p[util.tables.punchRecord.columns.punchTime].toDate());
+                tempData[_p[util.tables.punchRecord.columns.issuer]].punch.push(_p[util.tables.punchRecord.columns.punchTime]);
 
             }
         })
@@ -332,18 +334,18 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
             let _ar = ar.data();
             if (tempData[_ar[util.tables.leaveNote.columns.issuer]] !== undefined) {
                 tempData[_ar[util.tables.leaveNote.columns.issuer]].leaveNote.push({
-                    startLeaveTime: _ar[util.tables.leaveNote.columns.startLeaveTime].toDate(),
-                    endLeaveTime: _ar[util.tables.leaveNote.columns.endLeaveTime].toDate(),
+                    startLeaveTime: _ar[util.tables.leaveNote.columns.startLeaveTime],
+                    endLeaveTime: _ar[util.tables.leaveNote.columns.endLeaveTime],
                 })
             }
 
         })
         returnData = []
-        Object.keys(tempData).map(function(objectKey, index) {
+        Object.keys(tempData).map(function (objectKey, index) {
             returnData.push({
-                name : tempData[objectKey].name,
-                punchRecord : tempData[objectKey].punch,
-                leaveNote:tempData[objectKey].leaveNote
+                name: tempData[objectKey].name,
+                punchRecord: tempData[objectKey].punch,
+                leaveNote: tempData[objectKey].leaveNote
             })
             // var value = tempData[objectKey];
             // console.log(value);

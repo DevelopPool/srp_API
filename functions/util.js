@@ -7,6 +7,22 @@ exports.checkEmpty = function checkEmpty(uncheckedValue) {
     return false;
 }
 
+exports.getMidNightUTCSeconds = function(){
+     
+    let midNight = Date.now();
+    let date = new Date();
+    midNight -= date.getUTCMilliseconds();
+    midNight -= date.getUTCSeconds() * 1000;
+    midNight -= date.getUTCMinutes() * 60 * 1000;
+    let hour = date .getUTCHours() + 8;
+    if(hour >= 24){
+        hour-=24;
+    }
+    midNight -= hour * 60 * 60 * 1000;
+
+    return midNight;
+}
+
 exports.tables = {
     announcement:{
         tableName:'announcement',

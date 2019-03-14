@@ -354,15 +354,20 @@ exports.loginCheck = _loginCheck;
 
 function _loginCheck(userID) {
     
-    let today = Date.now();
-    let date = new Date();
-    today -= date.getMilliseconds();
-    today -= date.getSeconds() * 1000;
-    today -= date.getMinutes() * 60 * 1000;
-    today -= date.getHours() * 60 * 60 * 1000;
+    // let midNight = Date.now();
+    // let date = new Date();
+    // midNight -= date.getUTCMilliseconds();
+    // midNight -= date.getUTCSeconds() * 1000;
+    // midNight -= date.getUTCMinutes() * 60 * 1000;
+    // let hour = date .getUTCHours() + 8;
+    // if(hour >= 24){
+    //     hour-=24;
+    // }
+    // midNight -= hour * 60 * 60 * 1000;
+    //console.log(midNight);
     let loginCheck = firestore.collection(util.tables.loginRecord.tableName)
         .where(util.tables.loginRecord.columns.uid, '==', userID)
-        .where(util.tables.loginRecord.columns.loginTime, '>', new Date(today))
+        .where(util.tables.loginRecord.columns.loginTime, '>', new Date(util.getMidNightUTCSeconds()))
         .orderBy(util.tables.loginRecord.columns.loginTime, 'desc')
         .get().then(snapshot => {
 

@@ -10,7 +10,7 @@ exports.addTeam = functions.https.onRequest((request, response) => {
     };
     if (teamName !== "") {
         admin.firestore().collection('team').doc(teamName).set({}).then(writeResult => {
-            console.log(writeResult);
+           // console.log(writeResult);
             resultObj.excutionResult = 'success';
             response.json(resultObj);
         }).catch(reason => {
