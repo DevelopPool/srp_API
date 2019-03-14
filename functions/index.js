@@ -60,28 +60,28 @@ exports.addWork = functions.https.onRequest((request, response) => {
         return resolve('parameter check pass');
     });
     //  todo
-    let workerExistCheck = firestore.collection(util.tables.users.tableName).get().then(snapshot => {
-        userIDs = [];
-        snapshot.forEach(result => {
-            userIDs.push(result.id);
-        })
-        let flag = true;
-        _worker.forEach(element => {
-            //console.log(userIDs.includes(element));
-            if (!userIDs.includes(element)) {
-                flag = false;
-            }
+    // let workerExistCheck = firestore.collection(util.tables.users.tableName).get().then(snapshot => {
+    //     userIDs = [];
+    //     snapshot.forEach(result => {
+    //         userIDs.push(result.id);
+    //     })
+    //     let flag = true;
+    //     _worker.forEach(element => {
+    //         //console.log(userIDs.includes(element));
+    //         if (!userIDs.includes(element)) {
+    //             flag = false;
+    //         }
 
-        })
+    //     })
 
-        if (flag) {
-            return Promise.resolve('worker check pass');
-        }
-        return Promise.reject('worker check fail');
+    //     if (flag) {
+    //         return Promise.resolve('worker check pass');
+    //     }
+    //     return Promise.reject('worker check fail');
 
-    })
+    // })
 
-    Promise.all([uidCheck, loginCheck, paracheck, teamCheck, workerExistCheck, workTimeCheck]).then(valuse => {
+    Promise.all([uidCheck, loginCheck, paracheck, teamCheck, "workerExistCheck", workTimeCheck]).then(valuse => {
         let WAColumn = util.tables.workAssignment.columns;
         let newAssignment = {};
         newAssignment[WAColumn.team] = _team;
@@ -118,7 +118,14 @@ exports.getWork = functions.https.onRequest((request, response) => {
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
 
     //check user 存在
-    let uidCheck = user.uidCheck(_uid);
+    let uidCheck = firestore.collection(util.tables.users.tableName).doc(_uid).get().then(doc => {
+        if (!doc.exists) {
+            return Promise.reject(`${_uid} does not exists`)
+        }
+        else {
+            return Promise.resolve(doc);
+        }
+    });
 
     //login check
     let loginCheck = user.loginCheck(_uid);
@@ -145,11 +152,13 @@ exports.getWork = functions.https.onRequest((request, response) => {
         })
 
     Promise.all([uidCheck, loginCheck, workTime]).then(values => {
-        console.log(values[2]);
+        //console.log(values[2]);
+        //console.log(values[0].data()[util.tables.users.columns.phoneNumber]);
+
         let WAColumn = util.tables.workAssignment.columns;
         return firestore.collection(util.tables.workAssignment.tableName)
             .where(WAColumn.workTime, '==', values[2])
-            .where(WAColumn.worker, 'array-contains', _uid)
+            .where(WAColumn.worker, 'array-contains', values[0].data()[util.tables.users.columns.phoneNumber])
             .where(WAColumn.modifyTime, '>=', new Date(util.getMidNightUTCSeconds()))
             .orderBy(WAColumn.modifyTime)
             .get()
