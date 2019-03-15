@@ -366,7 +366,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"事假\",\n\t\"startLeaveTime\":1552469087066,\n\t\"endLeaveTime\":1552499087066,\n\t\"desc\":\"測試假單2\"\n}"
+					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"其他\",\n\t\"startLeaveTime\":1552469087066,\n\t\"endLeaveTime\":1552499087066,\n\t\"desc\":\"等等就要刪掉啦\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/askLeave",
@@ -422,7 +422,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"leaveNoteUID\":\"jEJpyTCEtdEZl3i2kVRO\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"通過\",\n\t\"is_proved\":true\n\n}"
+					"raw": "{\n\t\"leaveNoteUID\":\"A0veHYa2s2DxjBQkPO2y\",\n\t\"authorizerUID\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"approve_desc\":\"通過\",\n\t\"is_proved\":false\n\n}"
 				},
 				"url": {
 					"raw": "{{host}}/authorizeAbsentNote",
@@ -450,7 +450,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "\n{\n    \"team\":\"生態組\",\n    \"workType\":\"234\",\n    \"workTime\":\"晚上\",\n    \"desc\":\"砍樹\",\n    \"worker\":[\"+886912345679\"],\n    \"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
+					"raw": "\n{\n    \"team\":\"生態組\",\n    \"workType\":\"234\",\n    \"workTime\":\"晚上\",\n    \"desc\":\"砍大樹\",\n    \"worker\":[\"+886912345679\",\"+886912345670\"],\n    \"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/addWork",
@@ -571,6 +571,34 @@
 					],
 					"path": [
 						"getMonthlyAttendanceRecord"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/deleteMyLeaveNote",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"LeaveNoteID\":\"AM3wetiHk2gcr7gkjGwJ\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/deleteMyLeaveNote",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"deleteMyLeaveNote"
 					]
 				}
 			},

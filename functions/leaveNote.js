@@ -179,7 +179,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
 
             getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
                 .where(util.tables.leaveNote.columns.authorized, '==', true)
-                .orderBy(util.tables.leaveNote.columns.authTime,'desc')
+                .orderBy(util.tables.leaveNote.columns.authTime, 'desc')
                 .offset(offset)
                 .limit(limit)
                 .get();
@@ -255,7 +255,7 @@ exports.authorizeAbsentNote = functions.https.onRequest((request, response) => {
     let leaveNoteUID = util.checkEmpty(request.body.leaveNoteUID) ? request.body.leaveNoteUID : defaultValue;
     let authorizerUID = util.checkEmpty(request.body.authorizerUID) ? request.body.authorizerUID : defaultValue;
     let authDesc = util.checkEmpty(request.body.approve_desc) ? request.body.approve_desc : defaultValue;
-    let is_proved = request.body.is_proved ;
+    let is_proved = request.body.is_proved;
     //確認leaveNote存在
 
     //登入確認
@@ -384,29 +384,47 @@ exports.getMyLeaveNoteList = functions.https.onRequest((request, response) => {
 
 });
 
-// exports.deleteMyLeaveNote = functions.https.onRequest((request, response) => {
+exports.deleteMyLeaveNote = functions.https.onRequest((request, response) => {
 
-//     let resultObj = {
-//         excutionResult: 'fail',
-//     };
-//     defaultValue = " ";
-
-
-//     let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
-//     let LNid = util.checkEmpty(request.body.LeaveNoteID) ? request.body.LeaveNoteID : defaultValue;
-
-//     let uidCheck = user.uidCheck(uid);
-//     let loginCheck = user.loginCheck(uid);
-
-//     Promise.all([uidCheck, loginCheck]).then(values => {
-//         return firestore.collection(util.tables.leaveNote.tableName).doc(LNid).delete();
-//     }).then(values => {
-//         resultObj.excutionResult = 'success';
-//         response.json(resultObj);
-//     }).catch(reason => {
-//         console.log(reason);
-//         response.json(resultObj);
-//     });
+    let resultObj = {
+        excutionResult: 'fail',
+    };
+    defaultValue = " ";
 
 
-// });
+    let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+    let LNid = util.checkEmpty(request.body.LeaveNoteID) ? request.body.LeaveNoteID : defaultValue;
+
+    let uidCheck = user.uidCheck(uid);
+    let loginCheck = user.loginCheck(uid);
+
+    Promise.all([uidCheck, loginCheck]).then(values => {
+        return firestore.collection(util.tables.leaveNote.tableName).doc(LNid).get();
+    })
+        .then(LN => {
+            if(!LN.exists){
+                return Promise.reject('LeaveNoteID does not exist');
+            }
+            let _data = LN.data();
+            if (_data[util.tables.leaveNote.columns.issuer] !== uid) {
+                return Promise.reject('uid and LeaveNoteID does not match or ');
+            }
+            else if( _data[util.tables.leaveNote.columns.authorized] === true){
+                return Promise.reject('LeaveNoteID is authorized');
+            }
+            else {
+                return firestore.collection(util.tables.leaveNote.tableName).doc(LNid).delete();
+            }
+
+        })
+        .then(value => {
+            resultObj.excutionResult = 'success';
+            response.json(resultObj);
+        })
+        .catch(reason => {
+            console.log(reason);
+            response.json(resultObj);
+        });
+
+
+});

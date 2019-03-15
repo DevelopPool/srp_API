@@ -207,7 +207,7 @@ exports.getMyLeaveNoteList = leaveNote.getMyLeaveNoteList;
 exports.getLeaveNoteList = leaveNote.getLeaveNoteList;
 exports.askLeave = leaveNote.askLeave;
 exports.authorizeAbsentNote = leaveNote.authorizeAbsentNote;
-//exports.deleteMyLeaveNote = leaveNote.deleteMyLeaveNote;
+exports.deleteMyLeaveNote = leaveNote.deleteMyLeaveNote;
 
 exports.punch = functions.https.onRequest((request, response) => {
     let resultObj = {
