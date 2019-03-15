@@ -110,9 +110,9 @@ exports.getWork = functions.https.onRequest((request, response) => {
 
     defaultValue = " ";
     //todo 時區問題待修正
-    let nowHour = new Date().getUTCHours()+8;
-    if(nowHour >= 24){
-        nowHour -=24;
+    let nowHour = new Date().getUTCHours() + 8;
+    if (nowHour >= 24) {
+        nowHour -= 24;
     }
     console.log(nowHour);
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
@@ -152,24 +152,45 @@ exports.getWork = functions.https.onRequest((request, response) => {
         })
 
     Promise.all([uidCheck, loginCheck, workTime]).then(values => {
+        console.log(values[1]);
         //console.log(values[2]);
         //console.log(values[0].data()[util.tables.users.columns.phoneNumber]);
 
         let WAColumn = util.tables.workAssignment.columns;
-        return firestore.collection(util.tables.workAssignment.tableName)
+
+        let users = firestore.collection(util.tables.users.tableName).get();
+        let workAssignmets = firestore.collection(util.tables.workAssignment.tableName)
             .where(WAColumn.workTime, '==', values[2])
             .where(WAColumn.worker, 'array-contains', values[0].data()[util.tables.users.columns.phoneNumber])
             .where(WAColumn.modifyTime, '>=', new Date(util.getMidNightUTCSeconds()))
             .orderBy(WAColumn.modifyTime)
-            .get()
-    }).then((snap) => {
-        let WA = []
-        snap.forEach((result => {
-            WA.push(result.data());
+            .get();
+        return Promise.all([users, workAssignmets])
+    }).then((values) => {
+        let users = values[0];
+        let WAs = values[1];
+        let returnWAs = [];
+        let userDic = {}
+        users.forEach(user => {
+            let _data = user.data()
+            userDic[_data.phoneNumber] = _data.name;
+        })
+        WAs.forEach((WA => {
+            let _data = WA.data();
+            let returnData = {};
+            returnData['desc'] = _data.desc;
+            returnData['modifyTime'] = _data.modifyTime;
+            returnData['modifyUser'] = _data.modifyUser;
+            returnData['team'] = _data.team;
+            returnData['worker'] = [];
+            _data.worker.map((phoneNumber) => {
+                returnData['worker'].push(userDic[phoneNumber]);
+            })
+            returnWAs.push(returnData);
         }))
         // 回傳成功
         resultObj.excutionResult = 'success';
-        resultObj['workAssignment'] = WA;
+        resultObj['workAssignment'] = returnWAs;
         response.json(resultObj);
     }).catch(reason => {
         console.log(reason);
@@ -283,6 +304,7 @@ exports.getMonthlyAttendanceRecord = functions.https.onRequest((request, respons
             return Promise.reject('gender does not exists');
         }
     });
+
     let uidCheck = user.uidCheck(uid);
     let loginCheck = user.loginCheck(uid);
 

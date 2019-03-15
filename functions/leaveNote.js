@@ -179,7 +179,7 @@ exports.getLeaveNoteList = functions.https.onRequest((request, response) => {
 
             getLeaveNote = firestore.collection(util.tables.leaveNote.tableName)
                 .where(util.tables.leaveNote.columns.authorized, '==', true)
-                .orderBy(util.tables.leaveNote.columns.authTime)
+                .orderBy(util.tables.leaveNote.columns.authTime,'desc')
                 .offset(offset)
                 .limit(limit)
                 .get();
