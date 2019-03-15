@@ -58,8 +58,8 @@ exports.getAnnouncement = functions.https.onRequest((request, response) => {
         });
 
     let getAnnouncement = admin.firestore().collection(util.tables.announcement.tableName)
-    .where(util.tables.announcement.columns.issueTime, ">", new Date(util.getMidNightUTCSeconds()))
     .orderBy(util.tables.announcement.columns.issueTime, 'desc')
+    .limit(10)
     .get();
 
     Promise.all([getUserInfo,getAnnouncement]).then(values=>{
