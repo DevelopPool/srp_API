@@ -1,7 +1,9 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const util = require('./util');
-
+const cors = require('cors')({
+    'origin': true,
+});
 //新增一筆團隊
 exports.addTeam = functions.https.onRequest((request, response) => {
     cors(request, response, () => {

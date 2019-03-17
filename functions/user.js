@@ -3,7 +3,6 @@ const admin = require('firebase-admin');
 const util = require('./util');
 const cors = require('cors')({
     'origin': true,
-
 });
 
 const firestore = admin.firestore();

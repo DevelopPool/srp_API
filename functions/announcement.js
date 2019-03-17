@@ -2,6 +2,9 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const util = require('./util');
 const user = require('./user');
+const cors = require('cors')({
+    'origin': true,
+});
 //新增一筆公告事項
 exports.addAnnouncement = functions.https.onRequest((request, response) => {
     cors(request, response, () => {
