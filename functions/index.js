@@ -114,7 +114,10 @@ exports.getWork = functions.https.onRequest((request, response) => {
     if (nowHour >= 24) {
         nowHour -= 24;
     }
-    console.log(nowHour);
+    //todo testOnly
+    nowHour = 8;
+
+
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
 
     //check user 存在
@@ -144,7 +147,6 @@ exports.getWork = functions.https.onRequest((request, response) => {
 
             docID = ""
             docs.forEach(doc => {
-                console.log(doc.data());
                 docID = doc.id;
             })
 

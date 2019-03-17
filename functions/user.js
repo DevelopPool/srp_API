@@ -1,7 +1,10 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const util = require('./util');
+const cors = require('cors')({
+    'origin': true,
 
+});
 
 const firestore = admin.firestore();
 const auth = admin.auth();
@@ -128,46 +131,53 @@ exports.register = functions.https.onRequest((request, response) => {
 });
 
 
+
 exports.checkLogin = functions.https.onRequest((request, response) => {
-    let resultObj = {
-        excutionResult: 'fail',
-    };
+    cors(request, response, () => {
 
-    let defaultValue = "";
-    let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
 
-    auth.getUser(uid).then(userRecord => {
+        let resultObj = {
+            excutionResult: 'fail',
+        };
 
-        // 確認 lastSignInTime存在
-        if (userRecord.metadata.lastSignInTime === null) {
-            return Promise.reject({ uid: userRecord.uid, log: "last Log In Time Null" });
-        }
-        else {
-            //確認 時間合理 十分鐘以內
-            let differSecond = (Date.now() - new Date(userRecord.metadata.lastSignInTime)) / 1000;
-            console.log(differSecond);
-            if (differSecond > 600) {
-                return Promise.reject({ uid: userRecord.uid, log: "last Log In Time over 600 seconds" });
+        let defaultValue = "";
+        let uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
+
+        auth.getUser(uid).then(userRecord => {
+
+            // 確認 lastSignInTime存在
+            if (userRecord.metadata.lastSignInTime === null) {
+                return Promise.reject({ uid: userRecord.uid, log: "last Log In Time Null" });
             }
+            else {
+                //確認 時間合理 十分鐘以內
+                let differSecond = (Date.now() - new Date(userRecord.metadata.lastSignInTime)) / 1000;
+                console.log(differSecond);
+                if (differSecond > 600) {
+                    return Promise.reject({ uid: userRecord.uid, log: "last Log In Time over 600 seconds" });
+                }
 
-            // 寫入 login record 
-            return firestore.collection(util.tables.loginRecord.tableName).add({
-                uid: userRecord.uid,
-                loginTime: new Date(),
-            })
+                // 寫入 login record 
+                return firestore.collection(util.tables.loginRecord.tableName).add({
+                    uid: userRecord.uid,
+                    loginTime: new Date(),
+                })
 
-        }
-    }).then((loginTime) => {
-        // 回傳成功
-        resultObj.excutionResult = 'success';
-        response.json(resultObj);
-    }).catch(reason => {
-        console.log(reason);
-        response.json(resultObj);
+            }
+        }).then((loginTime) => {
+            // 回傳成功
+            resultObj.excutionResult = 'success';
+
+            response.json(resultObj);
+        }).catch(reason => {
+            console.log(reason);
+            response.json(resultObj);
+        });
+
+
     });
 
 });
-
 // exports.logout = functions.https.onRequest((request, response) => {
 //     let resultObj = {
 //         excutionResult: 'fail',
@@ -294,14 +304,16 @@ exports.getUserDetail = functions.https.onRequest((request, response) => {
     defaultValue = " ";
 
     let _uid = util.checkEmpty(request.body.uid) ? request.body.uid : defaultValue;
-
-    firestore.collection(util.tables.users.tableName).doc(_uid).get().then(doc => {
-        if (doc.exists) {
-            return Promise.resolve(doc);
-        }
-        else {
-            return Promise.reject(`${_uid} does not exists.`);
-        }
+    let loginCheck = _loginCheck(_uid);
+    Promise.all([loginCheck]).then(values => {
+        return firestore.collection(util.tables.users.tableName).doc(_uid).get().then(doc => {
+            if (doc.exists) {
+                return Promise.resolve(doc);
+            }
+            else {
+                return Promise.reject(`${_uid} does not exists.`);
+            }
+        })
     }).then((doc) => {
         let data = doc.data();
         delete data.permission;
@@ -353,7 +365,7 @@ exports.getUserList = functions.https.onRequest((request, response) => {
 exports.loginCheck = _loginCheck;
 
 function _loginCheck(userID) {
-    
+
     // let midNight = Date.now();
     // let date = new Date();
     // midNight -= date.getUTCMilliseconds();
