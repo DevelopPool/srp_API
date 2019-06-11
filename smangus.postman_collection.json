@@ -282,7 +282,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"modifingUid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"gaga\",\n\t\"jobTitle\":\"superman\"\n}"
+					"raw": "{\n\t\"uid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"modifingUid\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"gender\":\"female\",\n\t\"team\":\"team101\",\n\t\"workingType\":\"partTime\",\n\t\"name\":\"gaga\",\n\t\"jobTitle\":\"superman\",\n\t\"permission\":\"superbad\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/updateUser",
@@ -366,7 +366,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"其他\",\n\t\"startLeaveTime\":1552469087066,\n\t\"endLeaveTime\":1552499087066,\n\t\"desc\":\"等等就要刪掉啦\"\n}"
+					"raw": "{\n\t\n\t\"issuer\":\"778TIlaNHBcW1lwvk3dZ1HuTuPv1\",\n\t\"type\":\"其他\",\n\t\"startLeaveTime\":1559923200000,\n\t\"endLeaveTime\":1560009600000,\n\t\"desc\":\"等等就要刪掉啦\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/askLeave",
@@ -601,6 +601,24 @@
 						"deleteMyLeaveNote"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{host}}/init",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/init",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"init"
+					]
+				},
+				"description": "do not use this"
 			},
 			"response": []
 		}

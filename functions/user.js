@@ -215,8 +215,8 @@ exports.updateUser = functions.https.onRequest((request, response) => {
         let _jobTitle = util.checkEmpty(request.body.jobTitle) ? request.body.jobTitle : defaultValue;
         let _team = util.checkEmpty(request.body.team) ? request.body.team : defaultValue;
         let _workingType = util.checkEmpty(request.body.workingType) ? request.body.workingType : defaultValue;
-        let _permission = util.checkEmpty(request.body.permission) ? request.body.workingType : defaultValue;
-
+        let _permission = util.checkEmpty(request.body.permission) ? request.body.permission : defaultValue;
+        console.log(_permission);
         let _verified = true;
 
 
