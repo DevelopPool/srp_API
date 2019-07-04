@@ -385,7 +385,7 @@ exports.getUserDetail = functions.https.onRequest((request, response) => {
             let userData = values[0];
             let leaveNotes = values[1];
             let workAssignments = values[2];
-            delete userData.permission;
+            //delete userData.permission;
             resultObj.userData = userData;
             resultObj.workAssignment = [];
             resultObj.leaveNote = [];
